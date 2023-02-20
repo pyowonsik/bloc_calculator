@@ -26,9 +26,10 @@ class InitEvent extends CalculatorEvent {
   List<Object> get props => [];
 }
 
-class InputValues extends CalculatorEvent {
-  final dynamic inputValue;
-  InputValues({required this.inputValue});
-  @override
-  List<Object> get props => [inputValue];
-}
+
+// class InputValues extends CalculatorEvent {
+//   final dynamic inputValue;
+//   InputValues({required this.inputValue});
+//   @override
+//   List<Object> get props => [inputValue];
+// }

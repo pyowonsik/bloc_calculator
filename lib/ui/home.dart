@@ -64,24 +64,24 @@ class Home extends StatelessWidget {
                   child: const Text('+')),
             ],
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     ElevatedButton(onPressed: () {}, child: const Text('4')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('5')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('6')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('-')),
-          //   ],
-          // ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     ElevatedButton(onPressed: () {}, child: const Text('7')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('8')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('9')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('*')),
-          //   ],
-          // ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(onPressed: () {}, child: const Text('4')),
+              ElevatedButton(onPressed: () {}, child: const Text('5')),
+              ElevatedButton(onPressed: () {}, child: const Text('6')),
+              ElevatedButton(onPressed: () {}, child: const Text('-')),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(onPressed: () {}, child: const Text('7')),
+              ElevatedButton(onPressed: () {}, child: const Text('8')),
+              ElevatedButton(onPressed: () {}, child: const Text('9')),
+              ElevatedButton(onPressed: () {}, child: const Text('*')),
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -97,8 +97,10 @@ class Home extends StatelessWidget {
                 return ElevatedButton(
                     onPressed: () {
                       context
+                          // .read<CalculatorBloc>()
+                          // .add(CalculateEvent(result: state.input));
                           .read<CalculatorBloc>()
-                          .add(CalculateEvent(result: state.input));
+                          .add(InputNumberEvent(input: '='));
                       isCalculate = true;
                     },
                     child: const Text('='));

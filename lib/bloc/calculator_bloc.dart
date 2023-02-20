@@ -13,7 +13,10 @@ import 'package:bloc_calculator/model/calculation_model.dart';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   dynamic lastNumber = '';
+  dynamic formula = '';
+  dynamic res = 0;
 
+  // List<String> operator = ['+', '-', '*', '/'];
   CalculatorBloc() : super(CalculatorState.init()) {
     on<InputNumberEvent>(_inputNumber);
     on<CalculateEvent>(_calculate);
@@ -22,17 +25,53 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   _inputNumber(InputNumberEvent event, emit) async {
-    lastNumber = lastNumber + event.input.toString();
+    formula = formula + event.input.toString();
 
-    emit(state.copyWith(input: lastNumber));
+    emit(state.copyWith(input: formula));
+
+    if (event.input == '+') {
+      dynamic result = formula.replaceAll(RegExp('[^0-9]'), "");
+
+      result = int.parse(result);
+      print(formula);
+      var formulaList = formula.split('+');
+      print(formulaList);
+
+      print('-- 원소 출력 --');
+      // print(formulaList[0]);
+      // print(formulaList[1]);
+      // print(formulaList[2]);
+
+      print('-- 결과 출력 --');
+      if (formulaList.length == 2) {
+        result = int.parse(formulaList[0]);
+      }
+      if (formulaList.length == 3) {
+        result = int.parse(formulaList[0]) + int.parse(formulaList[1]);
+      }
+      if (formulaList.length == 4) {
+        result = int.parse(formulaList[0]) +
+            int.parse(formulaList[1]) +
+            int.parse(formulaList[2]);
+      }
+      res = result;
+      // print(result);
+      // formula = '';
+    }
+
+    if (event.input == '=') {
+      res = formula + res.toString();
+      emit(state.copyWith(result: res));
+    }
   }
 
   _calculate(CalculateEvent event, emit) async {
-    emit(state.copyWith(result: event.result));
+    var result = formula + '=';
+    emit(state.copyWith(result: result));
   }
 
   _init(CalculatorEvent event, emit) async {
-    lastNumber = '';
+    formula = '';
     emit(state.copyWith(input: 0, result: 0));
   }
 
