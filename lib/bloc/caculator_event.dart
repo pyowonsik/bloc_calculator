@@ -6,8 +6,21 @@ abstract class CalculatorEvent extends Equatable {
 }
 
 class InputNumberEvent extends CalculatorEvent {
-  final int num;
-  InputNumberEvent({required this.num});
+  final dynamic input;
+  InputNumberEvent({required this.input});
   @override
-  List<Object> get props => [num];
+  List<Object> get props => [input];
+}
+
+class CalculateEvent extends CalculatorEvent {
+  final dynamic result;
+  CalculateEvent({required this.result});
+
+  @override
+  List<Object> get props => [result];
+}
+
+class InitEvent extends CalculatorEvent {
+  @override
+  List<Object> get props => [];
 }

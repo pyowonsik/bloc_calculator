@@ -1,20 +1,21 @@
 import 'package:equatable/equatable.dart';
 
 class CalculatorState extends Equatable {
-  final int result;
+  final dynamic input;
 
+  final dynamic result;
   const CalculatorState({
+    required this.input,
     required this.result,
   });
 
-  const CalculatorState.init() : this(result: 0);
+  const CalculatorState.init() : this(input: 0, result: 0);
 
-  CalculatorState copyWith({
-    int? result,
-  }) {
-    return CalculatorState(result: result ?? this.result);
+  CalculatorState copyWith({dynamic result, dynamic input}) {
+    return CalculatorState(
+        input: input ?? this.input, result: result ?? this.result);
   }
 
   @override
-  List<Object> get props => [result];
+  List<Object> get props => [input, result];
 }
