@@ -1,4 +1,8 @@
+import 'package:bloc_calculator/bloc/caculator_event.dart';
+import 'package:bloc_calculator/bloc/calculator_bloc.dart';
+import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -11,13 +15,22 @@ class Home extends StatelessWidget {
           const Text('0',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
-          const Text('0',
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+          BlocBuilder<CalculatorBloc, CalculatorState>(
+              builder: (context, state) {
+            return Text(state.result.toString(),
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold));
+          }),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(onPressed: () {}, child: const Text('1')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(num: 1));
+                  },
+                  child: const Text('1')),
               ElevatedButton(onPressed: () {}, child: const Text('2')),
               ElevatedButton(onPressed: () {}, child: const Text('3')),
               ElevatedButton(onPressed: () {}, child: const Text('/')),
