@@ -1,3 +1,4 @@
+import 'package:bloc_calculator/model/calculation_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class CalculatorEvent extends Equatable {
@@ -24,3 +25,11 @@ class InitEvent extends CalculatorEvent {
   @override
   List<Object> get props => [];
 }
+
+
+// class InputValues extends CalculatorEvent {
+//   final dynamic inputValue;
+//   InputValues({required this.inputValue});
+//   @override
+//   List<Object> get props => [inputValue];
+// }
