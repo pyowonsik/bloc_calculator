@@ -3,6 +3,9 @@ import 'package:bloc_calculator/bloc/calculator_bloc.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:binary_tree/binary_tree.dart';
+
+// develop 브랜치에서 다 가져와서 pr
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -10,6 +13,19 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isCalculate = false;
+
+    printTree() {
+      // 트리를 이용해 연산자들을 정렬하자 !!
+      var b = BinaryTree([10, 8, 16, 4, 9, 13, 25, 2, 6, 12, 14, 18]);
+
+      b.insert(26);
+      b.insert(27);
+      b.remove(27);
+
+      print(b.toListFrom(0, equal: false, greaterThan: true));
+
+      return;
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
@@ -67,19 +83,67 @@ class Home extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(onPressed: () {}, child: const Text('4')),
-              ElevatedButton(onPressed: () {}, child: const Text('5')),
-              ElevatedButton(onPressed: () {}, child: const Text('6')),
-              ElevatedButton(onPressed: () {}, child: const Text('-')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 4));
+                  },
+                  child: const Text('4')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 5));
+                  },
+                  child: const Text('5')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 6));
+                  },
+                  child: const Text('6')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '-'));
+                  },
+                  child: const Text('-')),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(onPressed: () {}, child: const Text('7')),
-              ElevatedButton(onPressed: () {}, child: const Text('8')),
-              ElevatedButton(onPressed: () {}, child: const Text('9')),
-              ElevatedButton(onPressed: () {}, child: const Text('*')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 7));
+                  },
+                  child: const Text('7')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 8));
+                  },
+                  child: const Text('8')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 9));
+                  },
+                  child: const Text('9')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '*'));
+                  },
+                  child: const Text('*')),
             ],
           ),
           // Row(
@@ -109,23 +173,47 @@ class Home extends StatelessWidget {
                     isCalculate = false;
                   },
                   child: const Text('AC')),
-              ElevatedButton(onPressed: () {}, child: const Text('0')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 0));
+                  },
+                  child: const Text('0')),
               BlocBuilder<CalculatorBloc, CalculatorState>(
                   builder: (context, state) {
                 return ElevatedButton(
                     onPressed: () {
                       context
-                          // .read<CalculatorBloc>()
-                          // .add(CalculateEvent(result: state.input));
+                          //     .read<CalculatorBloc>()
+                          //     .add(CalculateEvent(result: state.input));
                           .read<CalculatorBloc>()
                           .add(InputNumberEvent(input: '='));
                       isCalculate = true;
                     },
                     child: const Text('='));
               }),
-              ElevatedButton(onPressed: () {}, child: const Text('/')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '/'));
+                  },
+                  child: const Text('/')),
             ],
           ),
+          ElevatedButton(
+              onPressed: () {
+                context
+                    .read<CalculatorBloc>()
+                    .add(InputNumberEvent(input: 'CE'));
+              },
+              child: const Text('CE')),
+          ElevatedButton(
+              onPressed: () {
+                printTree();
+              },
+              child: const Text('Tree')),
         ],
       ),
     );
