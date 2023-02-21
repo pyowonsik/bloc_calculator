@@ -4,6 +4,8 @@ import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// develop 브랜치에서 다 가져와서 pr
+
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -70,7 +72,13 @@ class Home extends StatelessWidget {
               ElevatedButton(onPressed: () {}, child: const Text('4')),
               ElevatedButton(onPressed: () {}, child: const Text('5')),
               ElevatedButton(onPressed: () {}, child: const Text('6')),
-              ElevatedButton(onPressed: () {}, child: const Text('-')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '-'));
+                  },
+                  child: const Text('-')),
             ],
           ),
           Row(
@@ -79,7 +87,13 @@ class Home extends StatelessWidget {
               ElevatedButton(onPressed: () {}, child: const Text('7')),
               ElevatedButton(onPressed: () {}, child: const Text('8')),
               ElevatedButton(onPressed: () {}, child: const Text('9')),
-              ElevatedButton(onPressed: () {}, child: const Text('*')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '*'));
+                  },
+                  child: const Text('*')),
             ],
           ),
           Row(
@@ -97,15 +111,21 @@ class Home extends StatelessWidget {
                 return ElevatedButton(
                     onPressed: () {
                       context
-                          // .read<CalculatorBloc>()
-                          // .add(CalculateEvent(result: state.input));
+                          //     .read<CalculatorBloc>()
+                          //     .add(CalculateEvent(result: state.input));
                           .read<CalculatorBloc>()
                           .add(InputNumberEvent(input: '='));
                       isCalculate = true;
                     },
                     child: const Text('='));
               }),
-              ElevatedButton(onPressed: () {}, child: const Text('/')),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '/'));
+                  },
+                  child: const Text('/')),
             ],
           ),
         ],
