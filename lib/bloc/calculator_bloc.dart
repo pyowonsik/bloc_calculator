@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
-import 'package:bloc_calculator/model/calculation_model.dart';
+import 'package:flutter/material.dart';
+
+import 'package:binary_tree/binary_tree.dart';
 
 // Bloc 구조
 // Bloc 에서 이벤트를 통해 상태를 변경한다
@@ -12,72 +14,99 @@ import 'package:bloc_calculator/model/calculation_model.dart';
 // Bloc Builder를 통해 데이터 사용
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
-  dynamic lastNumber = '';
   dynamic formula = '';
-  dynamic res = 0;
+  dynamic formulaResult = 0;
+  dynamic operatorList = [];
+  dynamic number = '';
+  List<int> numbers = [];
+  bool isNumber = false;
 
-  // List<String> operator = ['+', '-', '*', '/'];
+  //
   CalculatorBloc() : super(CalculatorState.init()) {
     on<InputNumberEvent>(_inputNumber);
-    on<CalculateEvent>(_calculate);
     on<InitEvent>(_init);
-    // on<InputValues>(_inputValue);
   }
 
   _inputNumber(InputNumberEvent event, emit) async {
-    formula = formula + event.input.toString();
-
-    emit(state.copyWith(input: formula));
-
-    if (event.input == '+') {
-      dynamic result = formula.replaceAll(RegExp('[^0-9]'), "");
-
-      result = int.parse(result);
-      print(formula);
-      var formulaList = formula.split('+');
-      print(formulaList);
-
-      print('-- 원소 출력 --');
-      // print(formulaList[0]);
-      // print(formulaList[1]);
-      // print(formulaList[2]);
-
-      print('-- 결과 출력 --');
-      if (formulaList.length == 2) {
-        result = int.parse(formulaList[0]);
-      }
-      if (formulaList.length == 3) {
-        result = int.parse(formulaList[0]) + int.parse(formulaList[1]);
-      }
-      if (formulaList.length == 4) {
-        result = int.parse(formulaList[0]) +
-            int.parse(formulaList[1]) +
-            int.parse(formulaList[2]);
-      }
-      res = result;
-      // print(result);
-      // formula = '';
+    // event.input == 숫자
+    if (event.input.runtimeType == int) {
+      number = number + event.input.toString();
+      formula = formula + event.input.toString();
+      // emit
+      emit(state.copyWith(input: formula));
+      print('연산식 : $formula');
+      isNumber = true;
     }
 
+    // event.input == 연산자
+    if (event.input == '+' ||
+        event.input == '-' ||
+        event.input == '*' ||
+        event.input == '/') {
+      // 연산자 중복 입력 방지
+      if (isNumber == true) {
+        //
+        numbers.add(int.parse(number));
+        number = '';
+        //
+        operatorList.add(event.input.toString());
+        isNumber = false;
+        // emit
+        formula = formula + event.input.toString();
+        emit(state.copyWith(input: formula));
+      }
+
+      if (isNumber == false) {
+        // emit
+        formula = formula;
+        emit(state.copyWith(input: formula));
+      }
+    }
+
+    // event.input == 계산
     if (event.input == '=') {
-      res = formula + res.toString();
-      emit(state.copyWith(result: res));
-    }
-  }
+      // 연산자 마무리 o
 
-  _calculate(CalculateEvent event, emit) async {
-    var result = formula + '=';
-    emit(state.copyWith(result: result));
+      if (isNumber == true) {
+        numbers.add(int.parse(number));
+        number = '';
+
+        print(' -- 계산 시작 -- ');
+        print('연산식 : $formula');
+        print('숫자 리스트 : $numbers');
+        print('부호 리스트 : $operatorList');
+
+        // 트리
+        print('-- 트리 --');
+        var b = BinaryTree(numbers);
+        print(b.toListFrom(0, equal: false, greaterThan: true));
+        print(b);
+        //
+      }
+
+      //
+      // 연산자 마무리 x
+      if (isNumber == false) {
+        // emit
+        formula = formula;
+        emit(state.copyWith(input: formula));
+      }
+    }
+
+    if (event.input == 'CE') {
+      formula = formula.substring(0, formula.length - 1);
+      // print(formula[formula.length - 1]);
+      emit(state.copyWith(input: formula));
+    }
   }
 
   _init(CalculatorEvent event, emit) async {
     formula = '';
+    formulaResult = 0;
+    operatorList = [];
+    number = '';
+    numbers = [];
+    isNumber = true;
     emit(state.copyWith(input: 0, result: 0));
   }
-
-  // _inputValue(InputValues event, emit) async {
-  //   lastNum = lastNum + event.inputValue.toString();
-  //   print(lastNum);
-  //   emit(state.copyWith(calculationModel: CalculationModel(input: lastNum)));
-  // }
 }
