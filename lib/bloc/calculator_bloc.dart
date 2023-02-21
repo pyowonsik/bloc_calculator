@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
-import 'package:bloc_calculator/model/calculation_model.dart';
+import 'package:flutter/material.dart';
 
 // Bloc 구조
 // Bloc 에서 이벤트를 통해 상태를 변경한다
@@ -14,19 +14,15 @@ import 'package:bloc_calculator/model/calculation_model.dart';
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   dynamic formula = '';
   dynamic formulaResult = 0;
-  dynamic formulaList;
   dynamic operatorList = [];
   dynamic number = '';
   List<dynamic> numbers = [];
-  List<String> operator = ['+', '-', '*', '/'];
   bool isNumber = false;
 
   //
   CalculatorBloc() : super(CalculatorState.init()) {
     on<InputNumberEvent>(_inputNumber);
     on<InitEvent>(_init);
-    // on<InputValues>(_inputValue);
-    // on<CalculateEvent>(_calculate);
   }
 
   _inputNumber(InputNumberEvent event, emit) async {
@@ -34,6 +30,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     if (event.input.runtimeType == int) {
       number = number + event.input.toString();
       formula = formula + event.input.toString();
+      // emit
       emit(state.copyWith(input: formula));
       print('연산식 : $formula');
       isNumber = true;
@@ -44,51 +41,79 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         event.input == '-' ||
         event.input == '*' ||
         event.input == '/') {
-      //
-
+      // 연산자 중복 입력 방지
       if (isNumber == true) {
-        if (number != '') {
-          numbers.add(number);
-          number = '';
-          //
-          operatorList.add(event.input);
-          isNumber = false;
-          print('숫자 리스트 : $numbers');
-          print('부호 리스트 : $operatorList');
-          formula = formula + event.input.toString();
-          emit(state.copyWith(input: formula));
-          print('연산식 : $formula');
-        }
+        //
+        numbers.add(int.parse(number));
+        number = '';
+        //
+        operatorList.add(event.input.toString());
+        isNumber = false;
+        // emit
+        formula = formula + event.input.toString();
+        emit(state.copyWith(input: formula));
       }
 
       if (isNumber == false) {
+        // emit
         formula = formula;
         emit(state.copyWith(input: formula));
-        print('연산식 : $formula');
       }
-      // if (numbers.last == '') {
-      //   numbers.removeLast();
-      //   operatorList.removeLast();
-      // }
     }
 
     // event.input == 계산
-    if (event.input == '=') {}
+    if (event.input == '=') {
+      // 연산자 마무리 o
+      if (isNumber == true) {
+        numbers.add(int.parse(number));
+        number = '';
+
+        print(' -- 계산 시작 -- ');
+        print('연산식 : $formula');
+        print('숫자 리스트 : $numbers');
+        print('부호 리스트 : $operatorList');
+
+        // for (var i = 0; i < operatorList.length; i++) {
+        //   if (operatorList[i] == '*' || operatorList[i] == '/') {
+        //     var tmp;
+        //     tmp = operatorList[0];
+        //     operatorList[0] = operatorList[i];
+        //     operatorList[i] = tmp;
+        //     print(numbers[i - 1]);
+        //     print(numbers[i]);
+        //     print(numbers[i + 1]);
+
+        //     var answer = numbers[i] + numbers[i + 1];
+        //     print(answer);
+        //   }
+        // }
+
+        // print('변환후 : $operatorList');
+      }
+
+      //
+      // 연산자 마무리 x
+      if (isNumber == false) {
+        // emit
+        formula = formula;
+        emit(state.copyWith(input: formula));
+      }
+    }
+
+    if (event.input == 'CE') {
+      formula = formula.substring(0, formula.length - 1);
+      // print(formula[formula.length - 1]);
+      emit(state.copyWith(input: formula));
+    }
   }
 
   _init(CalculatorEvent event, emit) async {
     formula = '';
+    formulaResult = 0;
+    operatorList = [];
+    number = '';
+    numbers = [];
+    isNumber = true;
     emit(state.copyWith(input: 0, result: 0));
   }
-
-  // _calculate(CalculateEvent event, emit) async {
-  //   var result = formula + '=';
-  //   emit(state.copyWith(result: result));
-  // }
-
-  // _inputValue(InputValues event, emit) async {
-  //   lastNum = lastNum + event.inputValue.toString();
-  //   print(lastNum);
-  //   emit(state.copyWith(calculationModel: CalculationModel(input: lastNum)));
-  // }
 }
