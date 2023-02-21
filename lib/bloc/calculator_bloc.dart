@@ -5,6 +5,8 @@ import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
 
+import 'package:binary_tree/binary_tree.dart';
+
 // Bloc 구조
 // Bloc 에서 이벤트를 통해 상태를 변경한다
 // Bloc Provider를 통해 Bloc을 상속받은
@@ -16,7 +18,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   dynamic formulaResult = 0;
   dynamic operatorList = [];
   dynamic number = '';
-  List<dynamic> numbers = [];
+  List<int> numbers = [];
   bool isNumber = false;
 
   //
@@ -64,6 +66,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     // event.input == 계산
     if (event.input == '=') {
       // 연산자 마무리 o
+
       if (isNumber == true) {
         numbers.add(int.parse(number));
         number = '';
@@ -73,22 +76,12 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         print('숫자 리스트 : $numbers');
         print('부호 리스트 : $operatorList');
 
-        // for (var i = 0; i < operatorList.length; i++) {
-        //   if (operatorList[i] == '*' || operatorList[i] == '/') {
-        //     var tmp;
-        //     tmp = operatorList[0];
-        //     operatorList[0] = operatorList[i];
-        //     operatorList[i] = tmp;
-        //     print(numbers[i - 1]);
-        //     print(numbers[i]);
-        //     print(numbers[i + 1]);
-
-        //     var answer = numbers[i] + numbers[i + 1];
-        //     print(answer);
-        //   }
-        // }
-
-        // print('변환후 : $operatorList');
+        // 트리
+        print('-- 트리 --');
+        var b = BinaryTree(numbers);
+        print(b.toListFrom(0, equal: false, greaterThan: true));
+        print(b);
+        //
       }
 
       //

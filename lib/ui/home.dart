@@ -3,6 +3,7 @@ import 'package:bloc_calculator/bloc/calculator_bloc.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:binary_tree/binary_tree.dart';
 
 // develop 브랜치에서 다 가져와서 pr
 
@@ -12,6 +13,19 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isCalculate = false;
+
+    printTree() {
+      // 트리를 이용해 연산자들을 정렬하자 !!
+      var b = BinaryTree([10, 8, 16, 4, 9, 13, 25, 2, 6, 12, 14, 18]);
+
+      b.insert(26);
+      b.insert(27);
+      b.remove(27);
+
+      print(b.toListFrom(0, equal: false, greaterThan: true));
+
+      return;
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
@@ -177,6 +191,11 @@ class Home extends StatelessWidget {
                     .add(InputNumberEvent(input: 'CE'));
               },
               child: const Text('CE')),
+          ElevatedButton(
+              onPressed: () {
+                printTree();
+              },
+              child: const Text('Tree')),
         ],
       ),
     );
