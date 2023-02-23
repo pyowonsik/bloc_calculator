@@ -14,18 +14,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isCalculate = false;
 
-    printTree() {
-      // 트리를 이용해 연산자들을 정렬하자 !!
-      var b = BinaryTree([10, 8, 16, 4, 9, 13, 25, 2, 6, 12, 14, 18]);
-
-      b.insert(26);
-      b.insert(27);
-      b.remove(27);
-
-      print(b.toListFrom(0, equal: false, greaterThan: true));
-
-      return;
-    }
+    printTree() {}
 
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
