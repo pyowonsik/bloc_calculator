@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
+import 'package:stack/stack.dart';
 
 import 'package:binary_tree/binary_tree.dart';
 
@@ -65,8 +66,12 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
     // event.input == 계산
     if (event.input == '=') {
-      // 연산자 마무리 o
+      List<dynamic> Initfix = [];
+      List<dynamic> Postfix = [];
+      List<dynamic> sstack = [];
+      var result;
 
+      // 연산자 마무리 o
       if (isNumber == true) {
         numbers.add(int.parse(number));
         number = '';
@@ -76,15 +81,93 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         print('숫자 리스트 : $numbers');
         print('부호 리스트 : $operatorList');
 
-        // 트리
-        print('-- 트리 --');
-        var b = BinaryTree(numbers);
-        print(b.toListFrom(0, equal: false, greaterThan: true));
-        print(b);
-        //
-      }
+        // 토큰화
+        operatorList.add('');
+        for (var i = 0; i < numbers.length; i++) {
+          Initfix.add(numbers[i]);
+          Initfix.add(operatorList[i]);
+        }
+        Initfix.removeLast();
+        operatorList.add('');
 
+        // 스택 사용하여 후위표기 변환
+        print('Initfix : $Initfix');
+
+        // 스택 구현
+        // 후위표기로 변환하기
+        for (var i = 0; i < Initfix.length; i++) {
+          // 피연산자
+          if (Initfix[i].runtimeType == int) {
+            Postfix.add(Initfix[i]);
+          }
+          //
+          if (Initfix[i].runtimeType == String) {
+            if (sstack.isEmpty) {
+              sstack.add(Initfix[i]);
+              // print('sstack : $sstack');
+            } else {
+              if (Initfix[i] == '*' || Initfix[i] == '/') {
+                if (sstack.contains('*') || sstack.contains('/')) {
+                  List<dynamic> reversedSstack = List.from(sstack.reversed);
+                  Postfix.addAll(reversedSstack);
+                  sstack.clear();
+                  sstack.add(Initfix[i]);
+                  // print('sstack : $sstack');
+                }
+                if (sstack.contains('+') || sstack.contains('-')) {
+                  sstack.add(Initfix[i]);
+                  // print('sstack : $sstack');
+                }
+              }
+              if (Initfix[i] == '+' || Initfix[i] == '-') {
+                if (sstack.contains('+') ||
+                    sstack.contains('-') ||
+                    sstack.contains('*') ||
+                    sstack.contains('/')) {
+                  List<dynamic> reversedSstack = List.from(sstack.reversed);
+                  Postfix.addAll(reversedSstack);
+                  // print('sstack : $sstack');
+                  sstack.clear();
+                  // print('sstack : $sstack');
+                  sstack.add(Initfix[i]);
+                  // print('sstack : $sstack');
+                }
+              }
+            }
+          }
+        }
+
+        // List<dynamic> resultStack = [];
+        List<dynamic> reversedSstack = List.from(sstack.reversed);
+        Postfix.addAll(reversedSstack);
+        print('Postfix : $Postfix');
+        sstack.clear();
+        reversedSstack.clear();
+
+        // 후위 표기식 계산
+        for (var i = 0; i < Postfix.length; i++) {
+          // if (Postfix[i].runtimeType == int) {
+          //   resultStack.add(Postfix[i]);
+          //   print(resultStack);
+          // }
+
+          // if (Postfix[i].runtimeType == String) {
+          //   print(resultStack[i-1]);
+          //   print(resultStack[i-2]);
+          // }
+
+          // 일단 resultStack에 넣어야함
+
+          if (Postfix[i].runtimeType == String) {
+            if (Postfix[i] == '/') {
+              result = Postfix[i - 2] / Postfix[i - 1];
+            }
+          }
+        }
+        print('정답 : ' + result.toString());
+      }
       //
+
       // 연산자 마무리 x
       if (isNumber == false) {
         // emit
