@@ -108,12 +108,20 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
             } else {
               if (Initfix[i] == '*' || Initfix[i] == '/') {
                 if (sstack.contains('*') || sstack.contains('/')) {
-                  List<dynamic> reversedSstack = List.from(sstack.reversed);
-                  Postfix.addAll(reversedSstack);
-                  sstack.clear();
-                  sstack.add(Initfix[i]);
-                  // print('sstack : $sstack');
+                  if (sstack.contains('+') || sstack.contains('-')) {
+                    dynamic findDuplication = sstack.removeLast();
+
+                    Postfix.add(findDuplication);
+                  } else {
+                    List<dynamic> reversedSstack = List.from(sstack.reversed);
+                    Postfix.addAll(reversedSstack);
+                    Postfix.addAll(sstack);
+                    sstack.clear();
+                    sstack.add(Initfix[i]);
+                    // print('sstack : $sstack');
+                  }
                 }
+
                 if (sstack.contains('+') || sstack.contains('-')) {
                   sstack.add(Initfix[i]);
                   // print('sstack : $sstack');
@@ -145,61 +153,61 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         reversedSstack.clear();
 
         // 후위 표기식 계산
-        for (var i = 0; i < Postfix.length; i++) {
-          if (Postfix[i].runtimeType == int) {
-            resultStack.add(Postfix[i]);
-          }
-          if (Postfix[i].runtimeType == String) {
-            resultStack.add(Postfix[i]);
-            //
-            if (Postfix[i] == '+') {
-              print(resultStack);
-              resultStack.removeLast();
-              dynamic first = resultStack.removeLast();
-              dynamic second = resultStack.removeLast();
-              print(first);
-              print(second);
-              result = second + first;
-              resultStack.add(result);
-              print('Stack : $resultStack');
-            }
-            if (Postfix[i] == '-') {
-              print(resultStack);
-              resultStack.removeLast();
-              dynamic first = resultStack.removeLast();
-              dynamic second = resultStack.removeLast();
-              print(first);
-              print(second);
-              result = second - first;
-              resultStack.add(result);
-              print('Stack : $resultStack');
-            }
-            if (Postfix[i] == '*') {
-              print(resultStack);
-              resultStack.removeLast();
-              dynamic first = resultStack.removeLast();
-              dynamic second = resultStack.removeLast();
-              print(first);
-              print(second);
-              result = second * first;
-              resultStack.add(result);
-              print('Stack : $resultStack');
-            }
-            if (Postfix[i] == '/') {
-              print(resultStack);
-              resultStack.removeLast();
-              dynamic first = resultStack.removeLast();
-              dynamic second = resultStack.removeLast();
-              print(first);
-              print(second);
-              result = second / first;
-              resultStack.add(result);
-              print('Stack : $resultStack');
-            }
-            //
-          }
-        }
-        print('정답 : ' + resultStack.removeLast().toString());
+        // for (var i = 0; i < Postfix.length; i++) {
+        //   if (Postfix[i].runtimeType == int) {
+        //     resultStack.add(Postfix[i]);
+        //   }
+        //   if (Postfix[i].runtimeType == String) {
+        //     resultStack.add(Postfix[i]);
+        //     //
+        //     if (Postfix[i] == '+') {
+        //       print(resultStack);
+        //       resultStack.removeLast();
+        //       dynamic first = resultStack.removeLast();
+        //       dynamic second = resultStack.removeLast();
+        //       print(first);
+        //       print(second);
+        //       result = second + first;
+        //       resultStack.add(result);
+        //       print('Stack : $resultStack');
+        //     }
+        //     if (Postfix[i] == '-') {
+        //       print(resultStack);
+        //       resultStack.removeLast();
+        //       dynamic first = resultStack.removeLast();
+        //       dynamic second = resultStack.removeLast();
+        //       print(first);
+        //       print(second);
+        //       result = second - first;
+        //       resultStack.add(result);
+        //       print('Stack : $resultStack');
+        //     }
+        //     if (Postfix[i] == '*') {
+        //       print(resultStack);
+        //       resultStack.removeLast();
+        //       dynamic first = resultStack.removeLast();
+        //       dynamic second = resultStack.removeLast();
+        //       print(first);
+        //       print(second);
+        //       result = second * first;
+        //       resultStack.add(result);
+        //       print('Stack : $resultStack');
+        //     }
+        //     if (Postfix[i] == '/') {
+        //       print(resultStack);
+        //       resultStack.removeLast();
+        //       dynamic first = resultStack.removeLast();
+        //       dynamic second = resultStack.removeLast();
+        //       print(first);
+        //       print(second);
+        //       result = second / first;
+        //       resultStack.add(result);
+        //       print('Stack : $resultStack');
+        //     }
+        //     //
+        //   }
+        // }
+        // print('정답 : ' + resultStack.removeLast().toString());
       }
       //
 
