@@ -36,7 +36,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   _inputNumber(InputNumberEvent event, emit) async {
-    // 최초 연산시
+    // 계산 중
     if (!isCalculated) {
       // event.input == 숫자
       if (event.input.runtimeType == int) {
@@ -80,13 +80,13 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           print('부호 리스트 : $operatorList');
 
           // 중위 표기식 생성
-          operatorList.add(''); // 부호 숫자 인덱스 맞
+          operatorList.add(''); // 부호 숫자 인덱스 맞추기
           for (var i = 0; i < numbers.length; i++) {
             Initfix.add(numbers[i]);
             Initfix.add(operatorList[i]);
           }
           Initfix.removeLast();
-          operatorList.add('');
+          operatorList.removeLast();
           print('Initfix : $Initfix');
 
           // 후위 표기식 변환
@@ -187,11 +187,26 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           }
 
           // 계산시
-          calculatedNumber = resultStack.removeLast();
+          calculatedNumber = resultStack.elementAt(0);
           emit(state.copyWith(input: calculatedNumber));
           formula += '=';
           emit(state.copyWith(result: formula));
           isCalculated = true;
+          print(' ---------- result ----------');
+          print('formula : $formula');
+          print('numbers : $numbers');
+          print('operatorList : $operatorList');
+          print('initfix : $Initfix');
+          print('postfix : $Postfix');
+          print('resultStack : $resultStack');
+          formula = formula;
+          numbers.clear();
+          numbers.add(calculatedNumber);
+          operatorList.clear();
+          Initfix.clear();
+          Postfix.clear();
+          resultStack.clear();
+          print(' ---------- e n d ----------');
         }
 
         // 연산자로 끝났을 경우 = 입력해도 변화 없음
@@ -216,25 +231,28 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       // }
     }
 
-    // 연산 후
-    // if (isCalculated) {
-    //   if (event.input.runtimeType == int) {
-    //     formula = formula + event.input.toString();
-    //     emit(state.copyWith(input: formula));
-    //     isCalculated = false;
-    //     Initfix.clear();
-    //     Postfix.clear();
-    //     operatorList.clear();
-    //     numbers.clear();
-    //     resultStack.clear();0
-    //   }
-
-    //   if (operatorList.contains(event.input)) {
-    //     emit(state.copyWith(result: calculatedNumber));
-    //     formula = calculatedNumber.toString() + event.input;
-    //     emit(state.copyWith(input: formula));
-    //   }
-    // }
+    // 계산 완료
+    if (isCalculated) {
+      if (event.input.runtimeType == int) {
+        formula = formula + event.input.toString();
+        emit(state.copyWith(input: formula));
+      }
+      if (event.input == '+' ||
+          event.input == '-' ||
+          event.input == '*' ||
+          event.input == '/') {
+        isCalculated = false;
+        emit(state.copyWith(result: calculatedNumber));
+        formula = calculatedNumber.toString() + event.input;
+        emit(state.copyWith(input: formula));
+        operatorList.add(event.input);
+      }
+      if (event.input == 0) {
+        emit(state.copyWith(input: 0));
+        emit(state.copyWith(result: calculatedNumber));
+      }
+    }
+//
   }
 
   _init(CalculatorEvent event, emit) async {
