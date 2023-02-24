@@ -69,7 +69,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       List<dynamic> Initfix = [];
       List<dynamic> Postfix = [];
       List<dynamic> sstack = [];
-      var result;
+      int result = 0;
 
       // 연산자 마무리 o
       if (isNumber == true) {
@@ -137,7 +137,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           }
         }
 
-        // List<dynamic> resultStack = [];
+        List<dynamic> resultStack = [];
         List<dynamic> reversedSstack = List.from(sstack.reversed);
         Postfix.addAll(reversedSstack);
         print('Postfix : $Postfix');
@@ -146,25 +146,60 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
         // 후위 표기식 계산
         for (var i = 0; i < Postfix.length; i++) {
-          // if (Postfix[i].runtimeType == int) {
-          //   resultStack.add(Postfix[i]);
-          //   print(resultStack);
-          // }
-
-          // if (Postfix[i].runtimeType == String) {
-          //   print(resultStack[i-1]);
-          //   print(resultStack[i-2]);
-          // }
-
-          // 일단 resultStack에 넣어야함
-
+          if (Postfix[i].runtimeType == int) {
+            resultStack.add(Postfix[i]);
+          }
           if (Postfix[i].runtimeType == String) {
-            if (Postfix[i] == '/') {
-              result = Postfix[i - 2] / Postfix[i - 1];
+            resultStack.add(Postfix[i]);
+            //
+            if (Postfix[i] == '+') {
+              print(resultStack);
+              resultStack.removeLast();
+              dynamic first = resultStack.removeLast();
+              dynamic second = resultStack.removeLast();
+              print(first);
+              print(second);
+              result = second + first;
+              resultStack.add(result);
+              print('Stack : $resultStack');
             }
+            if (Postfix[i] == '-') {
+              print(resultStack);
+              resultStack.removeLast();
+              dynamic first = resultStack.removeLast();
+              dynamic second = resultStack.removeLast();
+              print(first);
+              print(second);
+              result = second - first;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            if (Postfix[i] == '*') {
+              print(resultStack);
+              resultStack.removeLast();
+              dynamic first = resultStack.removeLast();
+              dynamic second = resultStack.removeLast();
+              print(first);
+              print(second);
+              result = second * first;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            if (Postfix[i] == '/') {
+              print(resultStack);
+              resultStack.removeLast();
+              dynamic first = resultStack.removeLast();
+              dynamic second = resultStack.removeLast();
+              print(first);
+              print(second);
+              result = second / first;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            //
           }
         }
-        print('정답 : ' + result.toString());
+        print('정답 : ' + resultStack.removeLast().toString());
       }
       //
 
