@@ -135,24 +135,6 @@ class Home extends StatelessWidget {
                   child: const Text('*')),
             ],
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     ElevatedButton(onPressed: () {}, child: const Text('4')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('5')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('6')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('-')),
-          //   ],
-          // ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     ElevatedButton(onPressed: () {}, child: const Text('7')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('8')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('9')),
-          //     ElevatedButton(onPressed: () {}, child: const Text('*')),
-          //   ],
-          // ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

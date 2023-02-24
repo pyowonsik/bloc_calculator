@@ -1,12 +1,6 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
-import 'package:flutter/material.dart';
-import 'package:stack/stack.dart';
-
-import 'package:binary_tree/binary_tree.dart';
 
 // Bloc 구조
 // Bloc 에서 이벤트를 통해 상태를 변경한다
@@ -15,14 +9,24 @@ import 'package:binary_tree/binary_tree.dart';
 // Bloc Builder를 통해 데이터 사용
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
-  dynamic formula = '';
+  String formula = '';
   dynamic formulaResult = 0;
-  dynamic operatorList = [];
+  List<String> operatorList = [];
   dynamic number = '';
   List<int> numbers = [];
   bool isNumber = false;
+  dynamic operator = ['+', '-', '*', '/'];
 
-  //
+  List<dynamic> Initfix = [];
+  List<dynamic> Postfix = [];
+  List<String> sstack = [];
+  int result = 0;
+  List<dynamic> reversedSstack = [];
+  List<dynamic> resultStack = [];
+
+  dynamic firstNumber = 0;
+  dynamic lastNumber = 0;
+
   CalculatorBloc() : super(CalculatorState.init()) {
     on<InputNumberEvent>(_inputNumber);
     on<InitEvent>(_init);
@@ -31,34 +35,28 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   _inputNumber(InputNumberEvent event, emit) async {
     // event.input == 숫자
     if (event.input.runtimeType == int) {
-      number = number + event.input.toString();
+      // 식을 저장
       formula = formula + event.input.toString();
-      // emit
+
+      number = number + event.input.toString();
       emit(state.copyWith(input: formula));
       print('연산식 : $formula');
       isNumber = true;
     }
 
     // event.input == 연산자
-    if (event.input == '+' ||
-        event.input == '-' ||
-        event.input == '*' ||
-        event.input == '/') {
-      // 연산자 중복 입력 방지
-      if (isNumber == true) {
-        //
+    if (operator.contains(event.input)) {
+      // 연산자 입력
+      if (isNumber) {
         numbers.add(int.parse(number));
+        operatorList.add(event.input);
         number = '';
-        //
-        operatorList.add(event.input.toString());
         isNumber = false;
-        // emit
-        formula = formula + event.input.toString();
+        formula = formula + event.input;
         emit(state.copyWith(input: formula));
       }
-
-      if (isNumber == false) {
-        // emit
+      // 연산자 중복 입력시 변화 없음
+      if (!isNumber) {
         formula = formula;
         emit(state.copyWith(input: formula));
       }
@@ -66,13 +64,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
     // event.input == 계산
     if (event.input == '=') {
-      List<dynamic> Initfix = [];
-      List<dynamic> Postfix = [];
-      List<dynamic> sstack = [];
-      int result = 0;
-
-      // 연산자 마무리 o
-      if (isNumber == true) {
+      // 숫자로 끝났을 경우 마지막 숫자 추가후 계산
+      if (isNumber) {
         numbers.add(int.parse(number));
         number = '';
 
@@ -81,36 +74,34 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         print('숫자 리스트 : $numbers');
         print('부호 리스트 : $operatorList');
 
-        // 토큰화
-        operatorList.add('');
+        // 중위 표기식 생성
+        operatorList.add(''); // 부호 숫자 인덱스 맞춰줌
         for (var i = 0; i < numbers.length; i++) {
           Initfix.add(numbers[i]);
           Initfix.add(operatorList[i]);
         }
         Initfix.removeLast();
         operatorList.add('');
-
-        // 스택 사용하여 후위표기 변환
         print('Initfix : $Initfix');
 
-        // 스택 구현
-        // 후위표기로 변환하기
+        // 후위 표기식 변환
         for (var i = 0; i < Initfix.length; i++) {
           // 피연산자
           if (Initfix[i].runtimeType == int) {
             Postfix.add(Initfix[i]);
           }
-          //
-          if (Initfix[i].runtimeType == String) {
+          // 연산자
+          if (operator.contains(Initfix[i])) {
+            // 연산자 스택 Empty
             if (sstack.isEmpty) {
               sstack.add(Initfix[i]);
-              // print('sstack : $sstack');
-            } else {
+            }
+            // 연산자 스택 !Empty
+            else {
               if (Initfix[i] == '*' || Initfix[i] == '/') {
                 if (sstack.contains('*') || sstack.contains('/')) {
                   if (sstack.contains('+') || sstack.contains('-')) {
                     dynamic findDuplication = sstack.removeLast();
-
                     Postfix.add(findDuplication);
                   } else {
                     List<dynamic> reversedSstack = List.from(sstack.reversed);
@@ -118,13 +109,11 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                     Postfix.addAll(sstack);
                     sstack.clear();
                     sstack.add(Initfix[i]);
-                    // print('sstack : $sstack');
                   }
                 }
 
                 if (sstack.contains('+') || sstack.contains('-')) {
                   sstack.add(Initfix[i]);
-                  // print('sstack : $sstack');
                 }
               }
               if (Initfix[i] == '+' || Initfix[i] == '-') {
@@ -134,86 +123,71 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                     sstack.contains('/')) {
                   List<dynamic> reversedSstack = List.from(sstack.reversed);
                   Postfix.addAll(reversedSstack);
-                  // print('sstack : $sstack');
                   sstack.clear();
-                  // print('sstack : $sstack');
                   sstack.add(Initfix[i]);
-                  // print('sstack : $sstack');
                 }
               }
             }
           }
         }
-
-        List<dynamic> resultStack = [];
-        List<dynamic> reversedSstack = List.from(sstack.reversed);
+        reversedSstack = List.from(sstack.reversed);
         Postfix.addAll(reversedSstack);
         print('Postfix : $Postfix');
+
         sstack.clear();
         reversedSstack.clear();
 
         // 후위 표기식 계산
-        // for (var i = 0; i < Postfix.length; i++) {
-        //   if (Postfix[i].runtimeType == int) {
-        //     resultStack.add(Postfix[i]);
-        //   }
-        //   if (Postfix[i].runtimeType == String) {
-        //     resultStack.add(Postfix[i]);
-        //     //
-        //     if (Postfix[i] == '+') {
-        //       print(resultStack);
-        //       resultStack.removeLast();
-        //       dynamic first = resultStack.removeLast();
-        //       dynamic second = resultStack.removeLast();
-        //       print(first);
-        //       print(second);
-        //       result = second + first;
-        //       resultStack.add(result);
-        //       print('Stack : $resultStack');
-        //     }
-        //     if (Postfix[i] == '-') {
-        //       print(resultStack);
-        //       resultStack.removeLast();
-        //       dynamic first = resultStack.removeLast();
-        //       dynamic second = resultStack.removeLast();
-        //       print(first);
-        //       print(second);
-        //       result = second - first;
-        //       resultStack.add(result);
-        //       print('Stack : $resultStack');
-        //     }
-        //     if (Postfix[i] == '*') {
-        //       print(resultStack);
-        //       resultStack.removeLast();
-        //       dynamic first = resultStack.removeLast();
-        //       dynamic second = resultStack.removeLast();
-        //       print(first);
-        //       print(second);
-        //       result = second * first;
-        //       resultStack.add(result);
-        //       print('Stack : $resultStack');
-        //     }
-        //     if (Postfix[i] == '/') {
-        //       print(resultStack);
-        //       resultStack.removeLast();
-        //       dynamic first = resultStack.removeLast();
-        //       dynamic second = resultStack.removeLast();
-        //       print(first);
-        //       print(second);
-        //       result = second / first;
-        //       resultStack.add(result);
-        //       print('Stack : $resultStack');
-        //     }
-        //     //
-        //   }
-        // }
+        for (var i = 0; i < Postfix.length; i++) {
+          if (Postfix[i].runtimeType == int) {
+            resultStack.add(Postfix[i]);
+          }
+          if (operatorList.contains(Postfix[i])) {
+            resultStack.add(Postfix[i]);
+            //
+            if (Postfix[i] == '+') {
+              resultStack.removeLast();
+              firstNumber = resultStack.removeLast();
+              lastNumber = resultStack.removeLast();
+              result = lastNumber + firstNumber;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            if (Postfix[i] == '-') {
+              resultStack.removeLast();
+              firstNumber = resultStack.removeLast();
+              lastNumber = resultStack.removeLast();
+              result = lastNumber - firstNumber;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            if (Postfix[i] == '*') {
+              resultStack.removeLast();
+              firstNumber = resultStack.removeLast();
+              lastNumber = resultStack.removeLast();
+              result = lastNumber * firstNumber;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            if (Postfix[i] == '/') {
+              resultStack.removeLast();
+              firstNumber = resultStack.removeLast();
+              lastNumber = resultStack.removeLast();
+              result = lastNumber / firstNumber;
+              resultStack.add(result);
+              print('Stack : $resultStack');
+            }
+            //
+          }
+        }
         // print('정답 : ' + resultStack.removeLast().toString());
+        emit(state.copyWith(input: resultStack.removeLast().toString()));
+        emit(state.copyWith(result: formula));
       }
       //
 
-      // 연산자 마무리 x
-      if (isNumber == false) {
-        // emit
+      // 연산자로 끝났을 경우 = 입력해도 변화 없음
+      if (!isNumber) {
         formula = formula;
         emit(state.copyWith(input: formula));
       }
