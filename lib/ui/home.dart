@@ -43,31 +43,37 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: 1));
+                        .add(InputNumberEvent(input: 7));
                   },
-                  child: const Text('1')),
+                  child: const Text('7')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: 2));
+                        .add(InputNumberEvent(input: 8));
                   },
-                  child: const Text('2')),
+                  child: const Text('8')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: 3));
+                        .add(InputNumberEvent(input: 9));
                   },
-                  child: const Text('3')),
+                  child: const Text('9')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: '+'));
+                        .add(InputNumberEvent(input: '/'));
                   },
-                  child: const Text('+')),
+                  child: const Text('/')),
             ],
+          ),
+          const SizedBox(
+            height: 10,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -79,6 +85,7 @@ class Home extends StatelessWidget {
                         .add(InputNumberEvent(input: 4));
                   },
                   child: const Text('4')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
@@ -86,6 +93,7 @@ class Home extends StatelessWidget {
                         .add(InputNumberEvent(input: 5));
                   },
                   child: const Text('5')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
@@ -93,39 +101,7 @@ class Home extends StatelessWidget {
                         .add(InputNumberEvent(input: 6));
                   },
                   child: const Text('6')),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: '-'));
-                  },
-                  child: const Text('-')),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: 7));
-                  },
-                  child: const Text('7')),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: 8));
-                  },
-                  child: const Text('8')),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: 9));
-                  },
-                  child: const Text('9')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
@@ -135,15 +111,51 @@ class Home extends StatelessWidget {
                   child: const Text('*')),
             ],
           ),
+          const SizedBox(
+            height: 10,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
                   onPressed: () {
-                    context.read<CalculatorBloc>().add(InitEvent());
-                    isCalculate = false;
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 1));
                   },
-                  child: const Text('AC')),
+                  child: const Text('1')),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 2));
+                  },
+                  child: const Text('2')),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 3));
+                  },
+                  child: const Text('3')),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: '-'));
+                  },
+                  child: const Text('-')),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               ElevatedButton(
                   onPressed: () {
                     context
@@ -151,6 +163,7 @@ class Home extends StatelessWidget {
                         .add(InputNumberEvent(input: 0));
                   },
                   child: const Text('0')),
+              const SizedBox(width: 10),
               BlocBuilder<CalculatorBloc, CalculatorState>(
                   builder: (context, state) {
                 return ElevatedButton(
@@ -164,27 +177,23 @@ class Home extends StatelessWidget {
                     },
                     child: const Text('='));
               }),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                  onPressed: () {
+                    context.read<CalculatorBloc>().add(InitEvent());
+                    isCalculate = false;
+                  },
+                  child: const Text('AC')),
+              const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(InputNumberEvent(input: '/'));
+                        .add(InputNumberEvent(input: '+'));
                   },
-                  child: const Text('/')),
+                  child: const Text('+')),
             ],
           ),
-          ElevatedButton(
-              onPressed: () {
-                context
-                    .read<CalculatorBloc>()
-                    .add(InputNumberEvent(input: 'CE'));
-              },
-              child: const Text('CE')),
-          ElevatedButton(
-              onPressed: () {
-                printTree();
-              },
-              child: const Text('Tree')),
         ],
       ),
     );
