@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
@@ -10,24 +12,22 @@ import 'package:flutter/material.dart';
 // Bloc Builder를 통해 데이터 사용
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
-  String formula = '';
-  dynamic formulaResult = 0;
-  List<String> operatorList = [];
+  dynamic formula = '';
+  List<dynamic> operatorList = [];
   dynamic number = '';
-  List<int> numbers = [];
+  List<num> numbers = [];
   bool isNumber = false;
-  dynamic operator = ['+', '-', '*', '/'];
+  List<String> operator = ['+', '-', '*', '/'];
 
-  List<dynamic> Initfix = [];
-  List<dynamic> Postfix = [];
+  List<dynamic> initfix = [];
+  List<dynamic> postfix = [];
   List<String> sstack = [];
-  int result = 0;
-  List<dynamic> reversedSstack = [];
   List<dynamic> resultStack = [];
 
-  dynamic firstNumber = 0;
-  dynamic lastNumber = 0;
-  dynamic calculatedNumber = 0;
+  String? findDuplication;
+  num firstNumber = 0;
+  num lastNumber = 0;
+  num calculatedNumber = 0;
   bool isCalculated = false;
 
   CalculatorBloc() : super(CalculatorState.init()) {
@@ -36,16 +36,23 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   _inputNumber(InputNumberEvent event, emit) async {
+    print('연산식 : $formula');
+    print(' ---------- result ----------');
+    print('formula : $formula');
+    print('numbers : $numbers');
+    print('operatorList : $operatorList');
+    print('initfix : $initfix');
+    print('postfix : $postfix');
+    print('resultStack : $resultStack');
+    print(' ---------- e n d ----------');
     // 계산 중
     if (!isCalculated) {
       // event.input == 숫자
-      if (event.input.runtimeType == int) {
+      if (event.input is num) {
         // 식을 저장
         formula = formula + event.input.toString();
-
         number = number + event.input.toString();
         emit(state.copyWith(input: formula));
-        print('연산식 : $formula');
         isNumber = true;
       }
 
@@ -71,7 +78,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       if (event.input == '=') {
         // 숫자로 끝났을 경우 마지막 숫자 추가후 계산
         if (isNumber) {
-          numbers.add(int.parse(number));
+          numbers.add(double.parse(number));
           number = '';
 
           print(' -- 계산 시작 -- ');
@@ -82,107 +89,66 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           // 중위 표기식 생성
           operatorList.add(''); // 부호 숫자 인덱스 맞추기
           for (var i = 0; i < numbers.length; i++) {
-            Initfix.add(numbers[i]);
-            Initfix.add(operatorList[i]);
+            initfix.add(numbers[i]);
+            initfix.add(operatorList[i]);
           }
-          Initfix.removeLast();
+          initfix.removeLast();
           operatorList.removeLast();
-          print('Initfix : $Initfix');
+          print('Initfix : $initfix');
 
           // 후위 표기식 변환
-          for (var i = 0; i < Initfix.length; i++) {
+          for (var i = 0; i < initfix.length; i++) {
             // 피연산자
-            if (Initfix[i].runtimeType == int) {
-              Postfix.add(Initfix[i]);
+            if (initfix[i] is num) {
+              postfix.add(initfix[i]);
             }
             // 연산자
-            if (operator.contains(Initfix[i])) {
+            if (operator.contains(initfix[i])) {
               // 연산자 스택 Empty
               if (sstack.isEmpty) {
-                sstack.add(Initfix[i]);
+                sstack.add(initfix[i]);
               }
               // 연산자 스택 !Empty
               else {
-                if (Initfix[i] == '*' || Initfix[i] == '/') {
+                if (initfix[i] == '*' || initfix[i] == '/') {
                   if (sstack.contains('*') || sstack.contains('/')) {
                     if (sstack.contains('+') || sstack.contains('-')) {
-                      dynamic findDuplication = sstack.removeLast();
-                      Postfix.add(findDuplication);
+                      findDuplication = sstack.removeLast();
+                      postfix.add(findDuplication);
                     } else {
-                      List<dynamic> reversedSstack = List.from(sstack.reversed);
-                      Postfix.addAll(reversedSstack);
-                      Postfix.addAll(sstack);
+                      postfix.addAll(List.from(sstack.reversed));
+                      postfix.addAll(sstack);
                       sstack.clear();
-                      sstack.add(Initfix[i]);
+                      sstack.add(initfix[i]);
                     }
                   }
 
                   if (sstack.contains('+') || sstack.contains('-')) {
-                    sstack.add(Initfix[i]);
+                    sstack.add(initfix[i]);
                   }
                 }
-                if (Initfix[i] == '+' || Initfix[i] == '-') {
-                  if (sstack.contains('+') ||
-                      sstack.contains('-') ||
-                      sstack.contains('*') ||
-                      sstack.contains('/')) {
-                    List<dynamic> reversedSstack = List.from(sstack.reversed);
-                    Postfix.addAll(reversedSstack);
+                if (initfix[i] == '+' || initfix[i] == '-') {
+                  if (sstack.contains(operatorList[i])) {
+                    postfix.addAll(List.from(sstack.reversed));
                     sstack.clear();
-                    sstack.add(Initfix[i]);
+                    sstack.add(initfix[i]);
                   }
                 }
               }
             }
           }
-          reversedSstack = List.from(sstack.reversed);
-          Postfix.addAll(reversedSstack);
-          print('Postfix : $Postfix');
+          postfix.addAll(List.from(sstack.reversed));
+          print('Postfix : $postfix');
 
           sstack.clear();
-          reversedSstack.clear();
-
           // 후위 표기식 계산
-          for (var i = 0; i < Postfix.length; i++) {
-            if (Postfix[i].runtimeType == int) {
-              resultStack.add(Postfix[i]);
+          for (var i = 0; i < postfix.length; i++) {
+            if (postfix[i] is num) {
+              resultStack.add(postfix[i]);
             }
-            if (operatorList.contains(Postfix[i])) {
-              resultStack.add(Postfix[i]);
-              //
-              if (Postfix[i] == '+') {
-                resultStack.removeLast();
-                firstNumber = resultStack.removeLast();
-                lastNumber = resultStack.removeLast();
-                result = lastNumber + firstNumber;
-                resultStack.add(result);
-                print('Stack : $resultStack');
-              }
-              if (Postfix[i] == '-') {
-                resultStack.removeLast();
-                firstNumber = resultStack.removeLast();
-                lastNumber = resultStack.removeLast();
-                result = lastNumber - firstNumber;
-                resultStack.add(result);
-                print('Stack : $resultStack');
-              }
-              if (Postfix[i] == '*') {
-                resultStack.removeLast();
-                firstNumber = resultStack.removeLast();
-                lastNumber = resultStack.removeLast();
-                result = lastNumber * firstNumber;
-                resultStack.add(result);
-                print('Stack : $resultStack');
-              }
-              if (Postfix[i] == '/') {
-                resultStack.removeLast();
-                firstNumber = resultStack.removeLast();
-                lastNumber = resultStack.removeLast();
-                result = lastNumber / firstNumber;
-                resultStack.add(result);
-                print('Stack : $resultStack');
-              }
-              //
+            if (operatorList.contains(postfix[i])) {
+              resultStack.add(postfix[i]);
+              caculate(postfix[i], resultStack);
             }
           }
 
@@ -192,21 +158,9 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           formula += '=';
           emit(state.copyWith(result: formula));
           isCalculated = true;
-          print(' ---------- result ----------');
-          print('formula : $formula');
-          print('numbers : $numbers');
-          print('operatorList : $operatorList');
-          print('initfix : $Initfix');
-          print('postfix : $Postfix');
-          print('resultStack : $resultStack');
-          formula = formula;
           numbers.clear();
           numbers.add(calculatedNumber);
-          operatorList.clear();
-          Initfix.clear();
-          Postfix.clear();
-          resultStack.clear();
-          print(' ---------- e n d ----------');
+          init();
         }
 
         // 연산자로 끝났을 경우 = 입력해도 변화 없음
@@ -215,41 +169,32 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           emit(state.copyWith(input: formula));
         }
       }
-
-      // if (event.input == 'CE') {
-      //   if ((formula.length - 1).runtimeType == int) {
-      //     numbers.removeLast();
-      //   }
-      //   if ((formula.length - 1).runtimeType == String) {
-      //     operatorList.removeLast();
-      //   }
-
-      //   formula = formula.substring(0, formula.length - 1);
-      //   print(formula);
-
-      //   emit(state.copyWith(input: formula));
-      // }
     }
 
     // 계산 완료
     if (isCalculated) {
-      if (event.input.runtimeType == int) {
-        formula = formula + event.input.toString();
-        emit(state.copyWith(input: formula));
+      if (event.input is num) {
+        emit(state.copyWith(input: event.input, result: calculatedNumber));
+        numbers.clear();
+        formula = event.input.toString();
+        number += event.input.toString();
+        isCalculated = false;
       }
       if (event.input == '+' ||
           event.input == '-' ||
           event.input == '*' ||
           event.input == '/') {
         isCalculated = false;
-        emit(state.copyWith(result: calculatedNumber));
         formula = calculatedNumber.toString() + event.input;
-        emit(state.copyWith(input: formula));
+        emit(state.copyWith(input: formula, result: calculatedNumber));
         operatorList.add(event.input);
       }
       if (event.input == 0) {
-        emit(state.copyWith(input: 0));
-        emit(state.copyWith(result: calculatedNumber));
+        emit(state.copyWith(input: 0, result: calculatedNumber));
+        numbers.clear();
+        formula = '';
+        isCalculated = false;
+        isNumber = false;
       }
     }
 //
@@ -257,11 +202,37 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
   _init(CalculatorEvent event, emit) async {
     formula = '';
-    formulaResult = 0;
-    operatorList = [];
     number = '';
-    numbers = [];
-    isNumber = true;
+    numbers.clear();
+    init();
     emit(state.copyWith(input: 0, result: 0));
+  }
+
+  void init() {
+    operatorList.clear();
+    initfix.clear();
+    resultStack.clear();
+    postfix.clear();
+  }
+
+  void caculate(op, resultStack) {
+    resultStack.removeLast();
+    firstNumber = resultStack.removeLast();
+    lastNumber = resultStack.removeLast();
+
+    switch (op) {
+      case '+':
+        resultStack.add(lastNumber + firstNumber);
+        break;
+      case '-':
+        resultStack.add(lastNumber - firstNumber);
+        break;
+      case '*':
+        resultStack.add(lastNumber * firstNumber);
+        break;
+      case '/':
+        resultStack.add(lastNumber / firstNumber);
+        break;
+    }
   }
 }
