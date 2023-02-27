@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
@@ -18,8 +20,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   bool isNumber = false;
   dynamic operator = ['+', '-', '*', '/'];
 
-  List<dynamic> Initfix = [];
-  List<dynamic> Postfix = [];
+  List<dynamic> initfix = [];
+  List<dynamic> postfix = [];
   List<String> sstack = [];
   int result = 0;
   List<dynamic> reversedSstack = [];
@@ -29,6 +31,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   dynamic lastNumber = 0;
   dynamic calculatedNumber = 0;
   bool isCalculated = false;
+  bool isZero = false;
 
   CalculatorBloc() : super(CalculatorState.init()) {
     on<InputNumberEvent>(_inputNumber);
@@ -82,75 +85,75 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           // 중위 표기식 생성
           operatorList.add(''); // 부호 숫자 인덱스 맞추기
           for (var i = 0; i < numbers.length; i++) {
-            Initfix.add(numbers[i]);
-            Initfix.add(operatorList[i]);
+            initfix.add(numbers[i]);
+            initfix.add(operatorList[i]);
           }
-          Initfix.removeLast();
+          initfix.removeLast();
           operatorList.removeLast();
-          print('Initfix : $Initfix');
+          print('Initfix : $initfix');
 
           // 후위 표기식 변환
-          for (var i = 0; i < Initfix.length; i++) {
+          for (var i = 0; i < initfix.length; i++) {
             // 피연산자
-            if (Initfix[i].runtimeType == int) {
-              Postfix.add(Initfix[i]);
+            if (initfix[i].runtimeType == int) {
+              postfix.add(initfix[i]);
             }
             // 연산자
-            if (operator.contains(Initfix[i])) {
+            if (operator.contains(initfix[i])) {
               // 연산자 스택 Empty
               if (sstack.isEmpty) {
-                sstack.add(Initfix[i]);
+                sstack.add(initfix[i]);
               }
               // 연산자 스택 !Empty
               else {
-                if (Initfix[i] == '*' || Initfix[i] == '/') {
+                if (initfix[i] == '*' || initfix[i] == '/') {
                   if (sstack.contains('*') || sstack.contains('/')) {
                     if (sstack.contains('+') || sstack.contains('-')) {
                       dynamic findDuplication = sstack.removeLast();
-                      Postfix.add(findDuplication);
+                      postfix.add(findDuplication);
                     } else {
                       List<dynamic> reversedSstack = List.from(sstack.reversed);
-                      Postfix.addAll(reversedSstack);
-                      Postfix.addAll(sstack);
+                      postfix.addAll(reversedSstack);
+                      postfix.addAll(sstack);
                       sstack.clear();
-                      sstack.add(Initfix[i]);
+                      sstack.add(initfix[i]);
                     }
                   }
 
                   if (sstack.contains('+') || sstack.contains('-')) {
-                    sstack.add(Initfix[i]);
+                    sstack.add(initfix[i]);
                   }
                 }
-                if (Initfix[i] == '+' || Initfix[i] == '-') {
+                if (initfix[i] == '+' || initfix[i] == '-') {
                   if (sstack.contains('+') ||
                       sstack.contains('-') ||
                       sstack.contains('*') ||
                       sstack.contains('/')) {
                     List<dynamic> reversedSstack = List.from(sstack.reversed);
-                    Postfix.addAll(reversedSstack);
+                    postfix.addAll(reversedSstack);
                     sstack.clear();
-                    sstack.add(Initfix[i]);
+                    sstack.add(initfix[i]);
                   }
                 }
               }
             }
           }
           reversedSstack = List.from(sstack.reversed);
-          Postfix.addAll(reversedSstack);
-          print('Postfix : $Postfix');
+          postfix.addAll(reversedSstack);
+          print('Postfix : $postfix');
 
           sstack.clear();
           reversedSstack.clear();
 
           // 후위 표기식 계산
-          for (var i = 0; i < Postfix.length; i++) {
-            if (Postfix[i].runtimeType == int) {
-              resultStack.add(Postfix[i]);
+          for (var i = 0; i < postfix.length; i++) {
+            if (postfix[i].runtimeType == int) {
+              resultStack.add(postfix[i]);
             }
-            if (operatorList.contains(Postfix[i])) {
-              resultStack.add(Postfix[i]);
+            if (operatorList.contains(postfix[i])) {
+              resultStack.add(postfix[i]);
               //
-              if (Postfix[i] == '+') {
+              if (postfix[i] == '+') {
                 resultStack.removeLast();
                 firstNumber = resultStack.removeLast();
                 lastNumber = resultStack.removeLast();
@@ -158,7 +161,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                 resultStack.add(result);
                 print('Stack : $resultStack');
               }
-              if (Postfix[i] == '-') {
+              if (postfix[i] == '-') {
                 resultStack.removeLast();
                 firstNumber = resultStack.removeLast();
                 lastNumber = resultStack.removeLast();
@@ -166,7 +169,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                 resultStack.add(result);
                 print('Stack : $resultStack');
               }
-              if (Postfix[i] == '*') {
+              if (postfix[i] == '*') {
                 resultStack.removeLast();
                 firstNumber = resultStack.removeLast();
                 lastNumber = resultStack.removeLast();
@@ -174,7 +177,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                 resultStack.add(result);
                 print('Stack : $resultStack');
               }
-              if (Postfix[i] == '/') {
+              if (postfix[i] == '/') {
                 resultStack.removeLast();
                 firstNumber = resultStack.removeLast();
                 lastNumber = resultStack.removeLast();
@@ -196,15 +199,15 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           print('formula : $formula');
           print('numbers : $numbers');
           print('operatorList : $operatorList');
-          print('initfix : $Initfix');
-          print('postfix : $Postfix');
+          print('initfix : $initfix');
+          print('postfix : $postfix');
           print('resultStack : $resultStack');
           formula = formula;
           numbers.clear();
           numbers.add(calculatedNumber);
           operatorList.clear();
-          Initfix.clear();
-          Postfix.clear();
+          initfix.clear();
+          postfix.clear();
           resultStack.clear();
           print(' ---------- e n d ----------');
         }
@@ -233,9 +236,13 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
     // 계산 완료
     if (isCalculated) {
-      if (event.input.runtimeType == int) {
-        formula = formula + event.input.toString();
-        emit(state.copyWith(input: formula));
+      if (event.input is int) {
+        // formula = formula + event.input.toString();
+        // emit(state.copyWith(input: formula));
+        // if (state.result is String) {
+        //   formula = formula;
+        //   emit(state.copyWith(input: formula));
+        // }
       }
       if (event.input == '+' ||
           event.input == '-' ||
@@ -248,8 +255,12 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         operatorList.add(event.input);
       }
       if (event.input == 0) {
-        emit(state.copyWith(input: 0));
-        emit(state.copyWith(result: calculatedNumber));
+        emit(state.copyWith(input: 0, result: calculatedNumber));
+        numbers.clear();
+        // number.add(0)
+        formula = '';
+        isCalculated = false;
+        isNumber = false;
       }
     }
 //
