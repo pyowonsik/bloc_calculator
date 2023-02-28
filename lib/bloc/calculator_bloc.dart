@@ -13,11 +13,7 @@ import 'package:flutter/material.dart';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   dynamic formula = '';
-<<<<<<< HEAD
-  List<dynamic> operatorList = [];
-=======
   List<String> operatorList = [];
->>>>>>> feature/ui
   dynamic number = '';
   List<num> numbers = [];
   bool isNumber = false;
@@ -26,16 +22,10 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<dynamic> initfix = [];
   List<dynamic> postfix = [];
   List<String> sstack = [];
-<<<<<<< HEAD
-  List<dynamic> resultStack = [];
-
-  String? findDuplication;
-=======
   String? findDuplication;
 
   List<dynamic> resultStack = [];
 
->>>>>>> feature/ui
   num firstNumber = 0;
   num lastNumber = 0;
   num calculatedNumber = 0;
@@ -166,14 +156,10 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                   }
                 }
                 if (initfix[i] == '+' || initfix[i] == '-') {
-<<<<<<< HEAD
-                  if (sstack.contains(operatorList[i])) {
-=======
                   if (sstack.contains('+') ||
                       sstack.contains('-') ||
                       sstack.contains('*') ||
                       sstack.contains('/')) {
->>>>>>> feature/ui
                     postfix.addAll(List.from(sstack.reversed));
                     sstack.clear();
                     sstack.add(initfix[i]);
@@ -186,10 +172,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           print('Postfix : $postfix');
 
           sstack.clear();
-<<<<<<< HEAD
-=======
-
->>>>>>> feature/ui
           // 후위 표기식 계산
           for (var i = 0; i < postfix.length; i++) {
             if (postfix[i] is num) {
@@ -207,11 +189,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           formula += '=';
           emit(state.copyWith(result: formula));
           isCalculated = true;
-<<<<<<< HEAD
-          numbers.clear();
-          numbers.add(calculatedNumber);
-          init();
-=======
           print(' ---------- result ----------');
           print('formula : $formula');
           print('numbers : $numbers');
@@ -223,7 +200,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           numbers.add(calculatedNumber);
           init();
           print(' ---------- e n d ----------');
->>>>>>> feature/ui
         }
 
         // 연산자로 끝났을 경우 = 입력해도 변화 없음

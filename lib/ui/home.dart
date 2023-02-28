@@ -183,7 +183,6 @@ class Home extends StatelessWidget {
                     context
                         .read<CalculatorBloc>()
                         .add(InputNumberEvent(input: 'CE'));
-                    isCalculate = false;
                   },
                   child: const Text('CE')),
               const SizedBox(width: 10),
