@@ -81,11 +81,14 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
             formula[formula.length - 1] == '*' ||
             formula[formula.length - 1] == '/') {
           operatorList.removeLast();
+          isNumber = true;
+
+          if (number == '') {
+            number = numbers.removeLast().toString();
+            print(number);
+          }
         } else {
           number = number.toString().substring(0, number.toString().length - 1);
-          if (number == '') {
-            number = numbers.removeLast();
-          }
         }
 
         formula = formula.substring(0, formula.length - 1);
@@ -99,6 +102,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         print('initfix : $initfix');
         print('postfix : $postfix');
         print('resultStack : $resultStack');
+
         print(' ---------- e n d ----------');
       }
 
@@ -170,8 +174,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           }
           postfix.addAll(List.from(sstack.reversed));
           print('Postfix : $postfix');
-
           sstack.clear();
+
           // 후위 표기식 계산
           for (var i = 0; i < postfix.length; i++) {
             if (postfix[i] is num) {
