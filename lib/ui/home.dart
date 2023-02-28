@@ -180,10 +180,12 @@ class Home extends StatelessWidget {
               const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
-                    context.read<CalculatorBloc>().add(InitEvent());
+                    context
+                        .read<CalculatorBloc>()
+                        .add(InputNumberEvent(input: 'CE'));
                     isCalculate = false;
                   },
-                  child: const Text('AC')),
+                  child: const Text('CE')),
               const SizedBox(width: 10),
               ElevatedButton(
                   onPressed: () {
