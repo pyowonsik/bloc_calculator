@@ -15,7 +15,6 @@ class Home extends StatelessWidget {
     bool isCalculate = false;
 
     printTree() {}
-
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
       body: Column(
@@ -169,8 +168,6 @@ class Home extends StatelessWidget {
                 return ElevatedButton(
                     onPressed: () {
                       context
-                          //     .read<CalculatorBloc>()
-                          //     .add(CalculateEvent(result: state.input));
                           .read<CalculatorBloc>()
                           .add(InputNumberEvent(input: '='));
                       isCalculate = true;

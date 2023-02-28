@@ -11,8 +11,3 @@ class InputNumberEvent extends CalculatorEvent {
   @override
   List<Object> get props => [input];
 }
-
-class InitEvent extends CalculatorEvent {
-  @override
-  List<Object> get props => [];
-}
