@@ -13,7 +13,11 @@ import 'package:flutter/material.dart';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   dynamic formula = '';
+<<<<<<< HEAD
   List<dynamic> operatorList = [];
+=======
+  List<String> operatorList = [];
+>>>>>>> feature/ui
   dynamic number = '';
   List<num> numbers = [];
   bool isNumber = false;
@@ -22,9 +26,16 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<dynamic> initfix = [];
   List<dynamic> postfix = [];
   List<String> sstack = [];
+<<<<<<< HEAD
   List<dynamic> resultStack = [];
 
   String? findDuplication;
+=======
+  String? findDuplication;
+
+  List<dynamic> resultStack = [];
+
+>>>>>>> feature/ui
   num firstNumber = 0;
   num lastNumber = 0;
   num calculatedNumber = 0;
@@ -60,7 +71,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       if (operator.contains(event.input)) {
         // 연산자 입력
         if (isNumber) {
-          numbers.add(int.parse(number));
+          numbers.add(double.parse(number));
           operatorList.add(event.input);
           number = '';
           isNumber = false;
@@ -72,6 +83,33 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           formula = formula;
           emit(state.copyWith(input: formula));
         }
+      }
+
+      if (event.input == 'CE') {
+        if (formula[formula.length - 1] == '+' ||
+            formula[formula.length - 1] == '-' ||
+            formula[formula.length - 1] == '*' ||
+            formula[formula.length - 1] == '/') {
+          operatorList.removeLast();
+        } else {
+          number = number.toString().substring(0, number.toString().length - 1);
+          if (number == '') {
+            number = numbers.removeLast();
+          }
+        }
+
+        formula = formula.substring(0, formula.length - 1);
+        emit(state.copyWith(input: formula));
+
+        print(' ---------- result ----------');
+        print('formula : $formula');
+        print('number : $number');
+        print('numbers : $numbers');
+        print('operatorList : $operatorList');
+        print('initfix : $initfix');
+        print('postfix : $postfix');
+        print('resultStack : $resultStack');
+        print(' ---------- e n d ----------');
       }
 
       // event.input == 계산
@@ -128,7 +166,14 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                   }
                 }
                 if (initfix[i] == '+' || initfix[i] == '-') {
+<<<<<<< HEAD
                   if (sstack.contains(operatorList[i])) {
+=======
+                  if (sstack.contains('+') ||
+                      sstack.contains('-') ||
+                      sstack.contains('*') ||
+                      sstack.contains('/')) {
+>>>>>>> feature/ui
                     postfix.addAll(List.from(sstack.reversed));
                     sstack.clear();
                     sstack.add(initfix[i]);
@@ -141,12 +186,16 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           print('Postfix : $postfix');
 
           sstack.clear();
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/ui
           // 후위 표기식 계산
           for (var i = 0; i < postfix.length; i++) {
             if (postfix[i] is num) {
               resultStack.add(postfix[i]);
             }
-            if (operatorList.contains(postfix[i])) {
+            if (postfix[i] is String) {
               resultStack.add(postfix[i]);
               caculate(postfix[i], resultStack);
             }
@@ -158,9 +207,23 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           formula += '=';
           emit(state.copyWith(result: formula));
           isCalculated = true;
+<<<<<<< HEAD
           numbers.clear();
           numbers.add(calculatedNumber);
           init();
+=======
+          print(' ---------- result ----------');
+          print('formula : $formula');
+          print('numbers : $numbers');
+          print('operatorList : $operatorList');
+          print('initfix : $initfix');
+          print('postfix : $postfix');
+          print('resultStack : $resultStack');
+          numbers.clear();
+          numbers.add(calculatedNumber);
+          init();
+          print(' ---------- e n d ----------');
+>>>>>>> feature/ui
         }
 
         // 연산자로 끝났을 경우 = 입력해도 변화 없음
@@ -189,7 +252,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         emit(state.copyWith(input: formula, result: calculatedNumber));
         operatorList.add(event.input);
       }
-      if (event.input == 0) {
+      if (event.input == 0 || event.input == 'CE') {
         emit(state.copyWith(input: 0, result: calculatedNumber));
         numbers.clear();
         formula = '';
