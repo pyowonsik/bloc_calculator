@@ -9,7 +9,7 @@ class CalculatorState extends Equatable {
     required this.result,
   });
 
-  CalculatorState.init()
+  const CalculatorState.init()
       : this(
           input: 0,
           result: 0,
