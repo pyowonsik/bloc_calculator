@@ -298,7 +298,9 @@ class Home extends StatelessWidget {
             children: [
               ElevatedButton(
                   onPressed: () {
-                    context.read<CalculatorBloc>().add(InputEvent(input: 0));
+                    context
+                        .read<CalculatorBloc>()
+                        .add(NumberPressed(number: 0));
                   },
                   child: const Text('0')),
               const SizedBox(width: 10),

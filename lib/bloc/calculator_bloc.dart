@@ -5,29 +5,19 @@ import 'package:bloc_calculator/bloc/calculator_state.dart';
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   String formula = '';
   bool isNumber = false;
+  bool isCalculated = false;
   List<String> operator = ['+', '-', '*', '/'];
-
-  // List<String> operatorList = [];
-  // dynamic number = '';
-  // List<num> numbers = [];
-  // List<dynamic> initfix = [];
-  // List<dynamic> postfix = [];
-  // List<String> sstack = [];
-  // String? findDuplication;
-  // List<dynamic> resultStack = [];
-  // num calculatedNumber = 0;
-  // bool isCalculated = false;
+  num resultNumber = 0;
 
   CalculatorBloc() : super(const CalculatorState.init()) {
-    // on<InputEvent>(_input);
     on<NumberPressed>(
       (NumberPressed event, emit) {
         bool isCalculated = false;
         if (!isCalculated) {
           emit(state.copyWith(input: formula += event.number.toString()));
+
           isNumber = true;
         }
-        // else : isCalculated
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
@@ -47,9 +37,11 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         String number = '';
         List<num> numbers = [];
         List<String> operatorList = [];
-        List<dynamic> resultStack = [];
+        List<dynamic> postfix = [];
         List<String> sstack = [];
+        List<dynamic> resultStack = [];
         String findDuplication = '';
+
         // 식 전체를 받아서 중위 표기식 토큰화
         for (var i = 0; i < formula.length; i++) {
           number += formula[i].toString();
@@ -63,34 +55,31 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         numbers.add(double.parse(number));
 
         // 후위 표기식
-        // * or / : 2차 , + or - : 1차
         operatorList.add('');
         for (var i = 0; i < numbers.length; i++) {
-          resultStack.add(numbers[i]);
+          postfix.add(numbers[i]);
           if (sstack.isEmpty) {
             sstack.add(operatorList[i]);
           } else {
             if (operatorList[i] == '*' || operatorList[i] == '/') {
               if (sstack.contains('*') || sstack.contains('/')) {
                 findDuplication = sstack.removeLast();
-                resultStack.add(findDuplication);
+                postfix.add(findDuplication);
                 sstack.add(operatorList[i]);
               }
               if (sstack.contains('+') || sstack.contains('-')) {
                 sstack.add(operatorList[i]);
               } else {
-                resultStack.add(sstack.removeLast());
-                resultStack.addAll(List.from(sstack.reversed));
+                postfix.addAll(List.from(sstack.reversed));
                 sstack.clear();
                 sstack.add(operatorList[i]);
               }
             }
+
             if (operatorList[i] == '+' || operatorList[i] == '-') {
-              if (sstack.contains('+') ||
-                  sstack.contains('-') ||
-                  sstack.contains('*') ||
-                  sstack.contains('/')) {
-                resultStack.addAll(List.from(sstack.reversed));
+              // stack 리스트 자체적으로 돌면서 operator에 포함되는지 확인
+              if (sstack.any((e) => operator.contains(e))) {
+                postfix.addAll(List.from(sstack.reversed));
                 sstack.clear();
                 sstack.add(operatorList[i]);
               }
@@ -98,19 +87,60 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           }
         }
 
-        resultStack.addAll(List.from(sstack.reversed));
+        postfix.addAll(List.from(sstack.reversed));
         sstack.clear();
 
         print('중위 : $formula');
-        print('후위 : $resultStack');
+        print('후위 : $postfix');
         // 후위 표기식 계산
+        for (var i = 0; i < postfix.length; i++) {
+          if (!(postfix[i] == '+' ||
+              postfix[i] == '-' ||
+              postfix[i] == '*' ||
+              postfix[i] == '/')) {
+            resultStack.add(postfix[i]);
+          }
+
+          switch (postfix[i]) {
+            case '+':
+              num firstNumber = resultStack.removeLast();
+              num lastNumber = resultStack.removeLast();
+              resultStack.add(lastNumber + firstNumber);
+              break;
+            case '-':
+              num firstNumber = resultStack.removeLast();
+              num lastNumber = resultStack.removeLast();
+              resultStack.add(lastNumber - firstNumber);
+              break;
+            case '*':
+              num firstNumber = resultStack.removeLast();
+              num lastNumber = resultStack.removeLast();
+              resultStack.add(lastNumber * firstNumber);
+              break;
+            case '/':
+              num firstNumber = resultStack.removeLast();
+              num lastNumber = resultStack.removeLast();
+              resultStack.add(lastNumber / firstNumber);
+              break;
+          }
+        }
+
+        isCalculated = true;
+        resultNumber = resultStack.removeLast();
+        emit(state.copyWith(input: resultNumber, result: formula));
       },
     );
 
     on<RemovePressed>(
       (RemovePressed event, emit) {
-        emit(state.copyWith(
-            input: formula = formula.substring(0, formula.length - 1)));
+        if (formula != '') {
+          emit(state.copyWith(
+              input: formula = formula.substring(0, formula.length - 1)));
+        }
+        if (isCalculated) {
+          formula = '';
+          emit(state.copyWith(input: 0, result: 'Ans = $resultNumber'));
+        }
       },
     );
   }
@@ -233,11 +263,11 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 //           // 후위 표기식 계산
 //           for (var i = 0; i < postfix.length; i++) {
 //             if (postfix[i] is num) {
-//               resultStack.add(postfix[i]);
+//               postfix.add(postfix[i]);
 //             }
 //             if (postfix[i] is String) {
-//               resultStack.add(postfix[i]);
-//               calculatedNumber = caculate(postfix[i], resultStack);
+//               postfix.add(postfix[i]);
+//               calculatedNumber = caculate(postfix[i], postfix);
 //             }
 //           }
 //           // 계산시
@@ -295,28 +325,28 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 //   void init() {
 //     operatorList.clear();
 //     initfix.clear();
-//     resultStack.clear();
+//     postfix.clear();
 //     postfix.clear();
 //   }
 
-//   num caculate(op, List resultStack) {
-//     resultStack.removeLast();
-//     num firstNumber = resultStack.removeLast();
-//     num lastNumber = resultStack.removeLast();
+//   num caculate(op, List postfix) {
+//     postfix.removeLast();
+//     num firstNumber = postfix.removeLast();
+//     num lastNumber = postfix.removeLast();
 //     switch (op) {
 //       case '+':
-//         resultStack.add(lastNumber + firstNumber);
+//         postfix.add(lastNumber + firstNumber);
 //         break;
 //       case '-':
-//         resultStack.add(lastNumber - firstNumber);
+//         postfix.add(lastNumber - firstNumber);
 //         break;
 //       case '*':
-//         resultStack.add(lastNumber * firstNumber);
+//         postfix.add(lastNumber * firstNumber);
 //         break;
 //       case '/':
-//         resultStack.add(lastNumber / firstNumber);
+//         postfix.add(lastNumber / firstNumber);
 //         break;
 //     }
-//     return resultStack.removeLast();
+//     return postfix.removeLast();
 //   }
 // }
