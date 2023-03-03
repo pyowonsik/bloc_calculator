@@ -2,7 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 
-// Todo : 함수 쪼개기 , 매개변수로 input.state 넣어서 순수함수사용
+const String initializedNumber = '0';
+
+// Todo : 함수 쪼개기 , 매개변수로 inputExpression.state 넣어서 순수함수사용
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<String> operator = ['+', '-', '*', '/'];
 
@@ -10,34 +12,32 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     on<NumberPressed>(
       (NumberPressed event, emit) {
         if (!state.isCalculated) {
-          if (state.input == '0') {
-            emit(state.copyWith(input: ''));
+          if (state.inputExpression == initializedNumber) {
+            emit(state.copyWith(inputExpression: ''));
           }
-          emit(state.copyWith(input: state.input + event.number.toString()));
+          emit(state.copyWith(
+              inputExpression:
+                  state.inputExpression + event.number.toString()));
         }
         if (state.isCalculated) {
-          if (event.number == 0) {
-            emit(
-              state.copyWith(
-                input: '',
-                result: 'Ans = ${state.calculateResultNumber.toString()}',
-                isCalculated: false,
-              ),
-            );
-          }
-
-          emit(state.copyWith(
-              input: event.number.toString(), isCalculated: false));
+          emit(
+            state.copyWith(
+              inputExpression: event.number.toString(),
+              resultExpression: 'Ans = ${state.calculatedNumber.toString()}',
+              isCalculated: false,
+            ),
+          );
         }
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
-      if (operator.contains(state.input[state.input.length - 1])) {
+      if (operator
+          .contains(state.inputExpression[state.inputExpression.length - 1])) {
         emit(
           state.copyWith(
             isCalculated: false,
-            input: state.input.toString().replaceRange(
-                  state.input.length - 1,
+            inputExpression: state.inputExpression.toString().replaceRange(
+                  state.inputExpression.length - 1,
                   null,
                   event.operator.toString(),
                 ),
@@ -46,7 +46,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       } else {
         emit(
           state.copyWith(
-            input: state.input + event.operator,
+            inputExpression: state.inputExpression + event.operator,
             isCalculated: false,
           ),
         );
@@ -55,17 +55,16 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
     on<CalculatePressed>(
       (CalculatePressed event, emit) {
-        List<dynamic> postfix = [];
         num resultNumber = 0;
 
         resultNumber = getPostFixCalculateResult(getPostFixExpression(
-            getNumbersFromExpression(state.input),
-            getOperatorFromExpression(state.input)));
+            getNumbersFromExpression(state.inputExpression),
+            getOperatorFromExpression(state.inputExpression)));
         emit(
           state.copyWith(
-            input: resultNumber.toString(),
-            result: state.input,
-            calculateResultNumber: resultNumber,
+            inputExpression: resultNumber.toString(),
+            resultExpression: state.inputExpression,
+            calculatedNumber: resultNumber,
             isCalculated: true,
           ),
         );
@@ -78,46 +77,50 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           emit(
             state.copyWith(
                 isCalculated: false,
-                input: '0',
-                result: 'Ans = ${state.calculateResultNumber.toString()}'),
+                inputExpression: '0',
+                resultExpression: 'Ans = ${state.calculatedNumber.toString()}'),
           );
         }
-        if (state.input != '') {
+        if (state.inputExpression != '') {
           emit(
             state.copyWith(
-              input: state.input.substring(0, state.input.length - 1),
+              inputExpression: state.inputExpression
+                  .substring(0, state.inputExpression.length - 1),
             ),
           );
         }
-        if (state.input == '') {
-          emit(state.copyWith(input: '0'));
+        if (state.inputExpression == '') {
+          emit(state.copyWith(inputExpression: '0'));
         }
       },
     );
   }
 
-  List<num> getNumbersFromExpression(String input) {
-    String number = '';
-    List<num> numbers = [];
-    for (var i = 0; i < input.length; i++) {
-      number += input[i].toString();
-      if (operator.contains(input[i])) {
-        number = number.substring(0, number.length - 1);
-        numbers.add(double.parse(number));
-        number = '';
-      }
-    }
-
-    numbers.add(double.parse(number));
-    return numbers;
+  List<num> getNumbersFromExpression(String inputExpression) {
+    // String number = '';
+    // List<num> numbers = [];
+    // for (var i = 0; i < inputExpression.length; i++) {
+    //   number += inputExpression[i].toString();
+    //   if (operator.contains(inputExpression[i])) {
+    //     number = number.substring(0, number.length - 1);
+    //     numbers.add(double.parse(number));
+    //     number = '';
+    //   }
+    // }
+    // numbers.add(double.parse(number));
+    return RegExp(r'\d+')
+        .allMatches(inputExpression)
+        .map((e) => double.parse(e[0]!))
+        .toList();
   }
 
-  List<String> getOperatorFromExpression(String input) {
-    List<String> operatorList = [];
-    for (var i = 0; i < input.length; i++) {
-      if (operator.contains(input[i])) operatorList.add(input[i]);
-    }
-    return operatorList;
+  List<String> getOperatorFromExpression(String inputExpression) {
+    // List<String> operatorList = [];
+    // for (var i = 0; i < inputExpression.length; i++) {
+    //   if (operator.contains(inputExpression[i])) operatorList.add(inputExpression[i]);
+    // }
+    // return operatorList;
+    return inputExpression.split(RegExp(r'\d+')).where((e) => e != '').toList();
   }
 
   List<dynamic> getPostFixExpression(
@@ -165,10 +168,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     num firstNumber = 0;
     num lastNumber = 0;
     for (var i = 0; i < postfix.length; i++) {
-      if (!(postfix[i] == '+' ||
-          postfix[i] == '-' ||
-          postfix[i] == '*' ||
-          postfix[i] == '/')) {
+      if (!operator.contains(postfix[i])) {
         resultStack.add(postfix[i]);
       }
 

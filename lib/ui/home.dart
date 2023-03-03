@@ -20,7 +20,7 @@ class Home extends StatelessWidget {
           BlocBuilder<CalculatorBloc, CalculatorState>(
               builder: (context, state) {
             return (isCalculate)
-                ? Text(state.result.toString(),
+                ? Text(state.resultExpression.toString(),
                     style: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.bold))
                 : Container();
@@ -28,7 +28,7 @@ class Home extends StatelessWidget {
           const SizedBox(height: 20),
           BlocBuilder<CalculatorBloc, CalculatorState>(
               builder: (context, state) {
-            return Text(state.input.toString(),
+            return Text(state.inputExpression.toString(),
                 style:
                     const TextStyle(fontSize: 40, fontWeight: FontWeight.bold));
           }),
