@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 
+// Todo : 부호 변경 , 코드 줄이기
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   bool isNumber = false;
   bool isCalculated = false;
@@ -89,6 +90,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         number = '';
       }
     }
+
     numbers.add(double.parse(number));
   }
 
@@ -104,8 +106,9 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       } else {
         if (operatorList[i] == '*' || operatorList[i] == '/') {
           if (sstack.contains('*') || sstack.contains('/')) {
-            findDuplication = sstack.removeLast();
-            postfix.add(findDuplication);
+            sstack.removeLast();
+            // findDuplication = sstack.removeLast();
+            // postfix.add(findDuplication);
             sstack.add(operatorList[i]);
           }
           if (sstack.contains('+') || sstack.contains('-')) {
