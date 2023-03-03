@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
@@ -6,29 +8,27 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   bool isNumber = false;
   bool isCalculated = false;
   List<String> operator = ['+', '-', '*', '/'];
-  String formula = '';
 
   CalculatorBloc() : super(const CalculatorState.init()) {
+    // 로직 다시 짜야됨
+
     on<NumberPressed>(
       (NumberPressed event, emit) {
+        if (!isCalculated) {
+          emit(state.copyWith(input: state.input + event.number.toString()));
+        }
+
         if (isCalculated) {
-          if (event.number == 0) {
-            emit(state.copyWith(
-                input: '', result: state.calculateResultNumber.toString()));
-          } else {
-            emit(
-                state.copyWith(result: state.calculateResultNumber.toString()));
-          }
-          isCalculated = false;
+          emit(state.copyWith(input: event.number.toString()));
         }
         isNumber = true;
-        emit(state.copyWith(input: state.input + event.number.toString()));
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
       if (isNumber) {
         emit(state.copyWith(input: state.input + event.operator));
         isNumber = false;
+        isCalculated = false;
       }
     });
 
@@ -59,6 +59,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           emit(state.copyWith(
               input: '0', result: state.calculateResultNumber.toString()));
           isCalculated = false;
+          isNumber = true;
         } else {
           if (state.input != '') {
             emit(state.copyWith(
