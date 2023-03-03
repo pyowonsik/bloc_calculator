@@ -6,6 +6,7 @@ import 'package:bloc_calculator/bloc/calculator_state.dart';
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   bool isNumber = false;
   bool isCalculated = false;
+
   List<String> operator = ['+', '-', '*', '/'];
 
   CalculatorBloc() : super(const CalculatorState.init()) {
@@ -24,6 +25,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                 result: 'Ans = ${state.calculateResultNumber.toString()}'));
             isCalculated = false;
           }
+
           emit(state.copyWith(input: event.number.toString()));
         }
         isNumber = true;
@@ -35,6 +37,10 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         isNumber = false;
         isCalculated = false;
       }
+
+      emit(state.copyWith(
+          input: state.input.toString().replaceRange(
+              state.input.length - 1, null, event.operator.toString())));
     });
 
     on<CalculatePressed>(
@@ -50,8 +56,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         postfix = getPostFixExpression(numbers, operatorList);
         // 후위 표기식 계산
         resultNumber = getPostFixCalculateResult(postfix);
-        print(resultNumber);
-
         emit(state.copyWith(
             input: resultNumber.toString(),
             result: state.input,
