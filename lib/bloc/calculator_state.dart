@@ -4,11 +4,12 @@ class CalculatorState extends Equatable {
   final String input;
   final String result;
   final num calculateResultNumber;
-
+  final bool isCalculated;
   const CalculatorState({
     required this.input,
     required this.result,
     required this.calculateResultNumber,
+    required this.isCalculated,
   });
 
   const CalculatorState.init()
@@ -16,18 +17,21 @@ class CalculatorState extends Equatable {
           input: '0',
           result: '0',
           calculateResultNumber: 0,
+          isCalculated: false,
         );
 
   CalculatorState copyWith({
     String? input,
     String? result,
     num? calculateResultNumber,
+    bool? isCalculated,
   }) {
     return CalculatorState(
       input: input ?? this.input,
       result: result ?? this.result,
       calculateResultNumber:
           calculateResultNumber ?? this.calculateResultNumber,
+      isCalculated: isCalculated ?? this.isCalculated,
     );
   }
 
