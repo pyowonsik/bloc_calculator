@@ -148,34 +148,26 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
     List<dynamic> resultStack = [];
-    num firstNumber = 0;
-    num lastNumber = 0;
     for (var i = 0; i < postfix.length; i++) {
       if (!operator.contains(postfix[i])) {
         resultStack.add(postfix[i]);
-      }
-
-      switch (postfix[i]) {
-        case '+':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber + firstNumber);
-          break;
-        case '-':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber - firstNumber);
-          break;
-        case '*':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber * firstNumber);
-          break;
-        case '/':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber / firstNumber);
-          break;
+      } else {
+        double operand1 = resultStack.removeLast();
+        double operand2 = resultStack.removeLast();
+        switch (postfix[i]) {
+          case '+':
+            resultStack.add(operand2 + operand1);
+            break;
+          case '-':
+            resultStack.add(operand2 - operand1);
+            break;
+          case '*':
+            resultStack.add(operand2 * operand1);
+            break;
+          case '/':
+            resultStack.add(operand2 / operand1);
+            break;
+        }
       }
     }
     return resultStack.removeLast();
