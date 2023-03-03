@@ -19,7 +19,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         if (isCalculated) {
           if (event.number == 0) {
             emit(state.copyWith(
-                input: '', result: state.calculateResultNumber.toString()));
+                input: '',
+                result: 'Ans = ${state.calculateResultNumber.toString()}'));
             isCalculated = false;
           }
           emit(state.copyWith(input: event.number.toString()));
@@ -61,7 +62,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       (RemovePressed event, emit) {
         if (isCalculated) {
           emit(state.copyWith(
-              input: '0', result: state.calculateResultNumber.toString()));
+              input: '0',
+              result: 'Ans = ${state.calculateResultNumber.toString()}'));
           isCalculated = false;
           isNumber = true;
         }
@@ -69,7 +71,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           emit(state.copyWith(
               input: state.input.substring(0, state.input.length - 1)));
         }
-
         if (state.input == '') {
           emit(state.copyWith(input: '0'));
         }
