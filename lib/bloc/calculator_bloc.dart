@@ -2,91 +2,114 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
 
+const String initializedNumber = '0';
+
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
-  bool isNumber = false;
-  bool isCalculated = false;
   List<String> operator = ['+', '-', '*', '/'];
-  String formula = '';
 
   CalculatorBloc() : super(const CalculatorState.init()) {
     on<NumberPressed>(
       (NumberPressed event, emit) {
-        if (isCalculated) {
-          if (event.number == 0) {
-            emit(state.copyWith(
-                input: '', result: state.calculateResultNumber.toString()));
-          } else {
-            emit(
-                state.copyWith(result: state.calculateResultNumber.toString()));
+        if (!state.isCalculated) {
+          if (state.inputExpression == initializedNumber) {
+            emit(state.copyWith(inputExpression: ''));
           }
-          isCalculated = false;
+          emit(state.copyWith(
+              inputExpression:
+                  state.inputExpression + event.number.toString()));
         }
-        isNumber = true;
-        emit(state.copyWith(input: state.input + event.number.toString()));
+        if (state.isCalculated) {
+          emit(
+            state.copyWith(
+              inputExpression: event.number.toString(),
+              resultExpression: 'Ans = ${state.calculatedNumber.toString()}',
+              isCalculated: false,
+            ),
+          );
+        }
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
-      if (isNumber) {
-        emit(state.copyWith(input: state.input + event.operator));
-        isNumber = false;
+      if (operator
+          .contains(state.inputExpression[state.inputExpression.length - 1])) {
+        emit(
+          state.copyWith(
+            isCalculated: false,
+            inputExpression: state.inputExpression.toString().replaceRange(
+                  state.inputExpression.length - 1,
+                  null,
+                  event.operator.toString(),
+                ),
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            inputExpression: state.inputExpression + event.operator,
+            isCalculated: false,
+          ),
+        );
       }
     });
 
     on<CalculatePressed>(
       (CalculatePressed event, emit) {
-        List<num> numbers = [];
-        List<String> operatorList = [];
-        List<dynamic> postfix = [];
         num resultNumber = 0;
 
-        // 중위 표기식 토큰
-        getInitFixExpression(numbers, operatorList);
-        // 후위 표기식 변환
-        postfix = getPostFixExpression(numbers, operatorList);
-        // 후위 표기식 계산
-        resultNumber = getPostFixCalculateResult(postfix);
-
-        emit(state.copyWith(
-            input: resultNumber.toString(),
-            result: state.input,
-            calculateResultNumber: resultNumber));
+        resultNumber = getPostFixCalculateResult(getPostFixExpression(
+            getNumbersFromExpression(state.inputExpression),
+            getOperatorFromExpression(state.inputExpression)));
+        emit(
+          state.copyWith(
+            inputExpression: resultNumber.toString(),
+            resultExpression: state.inputExpression,
+            calculatedNumber: resultNumber,
+            isCalculated: true,
+          ),
+        );
       },
     );
 
     on<RemovePressed>(
       (RemovePressed event, emit) {
-        if (isCalculated) {
-          emit(state.copyWith(
-              input: '0', result: state.calculateResultNumber.toString()));
-          isCalculated = false;
-        } else {
-          if (state.input != '') {
-            emit(state.copyWith(
-                input: state.input.substring(0, state.input.length - 1)));
-          }
+        if (state.isCalculated) {
+          emit(
+            state.copyWith(
+                isCalculated: false,
+                inputExpression: '0',
+                resultExpression: 'Ans = ${state.calculatedNumber.toString()}'),
+          );
+        }
+        if (state.inputExpression != '') {
+          emit(
+            state.copyWith(
+              inputExpression: state.inputExpression
+                  .substring(0, state.inputExpression.length - 1),
+            ),
+          );
+        }
+        if (state.inputExpression == '') {
+          emit(state.copyWith(inputExpression: '0'));
         }
       },
     );
   }
 
-  void getInitFixExpression(List<num> numbers, List<String> operatorList) {
-    String number = '';
-    for (var i = 0; i < state.input.length; i++) {
-      number += state.input[i].toString();
-      if (operator.contains(state.input[i])) {
-        operatorList.add(state.input[i]);
-        number = number.substring(0, number.length - 1);
-        numbers.add(double.parse(number));
-        number = '';
-      }
-    }
-    numbers.add(double.parse(number));
+  List<num> getNumbersFromExpression(String inputExpression) {
+    return RegExp(r'\d+')
+        .allMatches(inputExpression)
+        .map((e) => double.parse(e[0]!))
+        .toList();
   }
 
-  List getPostFixExpression(List<num> numbers, List<String> operatorList) {
+  List<String> getOperatorFromExpression(String inputExpression) {
+    return inputExpression.split(RegExp(r'\d+')).where((e) => e != '').toList();
+  }
+
+  List<dynamic> getPostFixExpression(
+      List<num> numbers, List<String> operatorList) {
     List<dynamic> postfix = [];
     List<String> sstack = [];
-    String findDuplication = '';
     operatorList.add('');
     for (var i = 0; i < numbers.length; i++) {
       postfix.add(numbers[i]);
@@ -95,8 +118,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       } else {
         if (operatorList[i] == '*' || operatorList[i] == '/') {
           if (sstack.contains('*') || sstack.contains('/')) {
-            findDuplication = sstack.removeLast();
-            postfix.add(findDuplication);
+            sstack.removeLast();
             sstack.add(operatorList[i]);
           }
           if (sstack.contains('+') || sstack.contains('-')) {
@@ -118,48 +140,36 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       }
     }
 
-    postfix.addAll(List.from(sstack.reversed));
-    sstack.clear();
-
-    return postfix;
+    return [...postfix, ...sstack];
+    // postfix.addAll(List.from(sstack.reversed));
+    // sstack.clear();
+    // return postfix;
   }
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
     List<dynamic> resultStack = [];
-    num firstNumber = 0;
-    num lastNumber = 0;
     for (var i = 0; i < postfix.length; i++) {
-      if (!(postfix[i] == '+' ||
-          postfix[i] == '-' ||
-          postfix[i] == '*' ||
-          postfix[i] == '/')) {
+      if (!operator.contains(postfix[i])) {
         resultStack.add(postfix[i]);
-      }
-
-      switch (postfix[i]) {
-        case '+':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber + firstNumber);
-          break;
-        case '-':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber - firstNumber);
-          break;
-        case '*':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber * firstNumber);
-          break;
-        case '/':
-          firstNumber = resultStack.removeLast();
-          lastNumber = resultStack.removeLast();
-          resultStack.add(lastNumber / firstNumber);
-          break;
+      } else {
+        double operand1 = resultStack.removeLast();
+        double operand2 = resultStack.removeLast();
+        switch (postfix[i]) {
+          case '+':
+            resultStack.add(operand2 + operand1);
+            break;
+          case '-':
+            resultStack.add(operand2 - operand1);
+            break;
+          case '*':
+            resultStack.add(operand2 * operand1);
+            break;
+          case '/':
+            resultStack.add(operand2 / operand1);
+            break;
+        }
       }
     }
-    isCalculated = true;
     return resultStack.removeLast();
   }
 }
