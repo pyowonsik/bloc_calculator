@@ -4,7 +4,6 @@ import 'package:bloc_calculator/bloc/calculator_state.dart';
 
 const String initializedNumber = '0';
 
-// Todo : 함수 쪼개기 , 매개변수로 inputExpression.state 넣어서 순수함수사용
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<String> operator = ['+', '-', '*', '/'];
 
@@ -97,17 +96,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   List<num> getNumbersFromExpression(String inputExpression) {
-    // String number = '';
-    // List<num> numbers = [];
-    // for (var i = 0; i < inputExpression.length; i++) {
-    //   number += inputExpression[i].toString();
-    //   if (operator.contains(inputExpression[i])) {
-    //     number = number.substring(0, number.length - 1);
-    //     numbers.add(double.parse(number));
-    //     number = '';
-    //   }
-    // }
-    // numbers.add(double.parse(number));
     return RegExp(r'\d+')
         .allMatches(inputExpression)
         .map((e) => double.parse(e[0]!))
@@ -115,11 +103,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   List<String> getOperatorFromExpression(String inputExpression) {
-    // List<String> operatorList = [];
-    // for (var i = 0; i < inputExpression.length; i++) {
-    //   if (operator.contains(inputExpression[i])) operatorList.add(inputExpression[i]);
-    // }
-    // return operatorList;
     return inputExpression.split(RegExp(r'\d+')).where((e) => e != '').toList();
   }
 
@@ -157,10 +140,10 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       }
     }
 
-    postfix.addAll(List.from(sstack.reversed));
-    sstack.clear();
-
-    return postfix;
+    return [...postfix, ...sstack];
+    // postfix.addAll(List.from(sstack.reversed));
+    // sstack.clear();
+    // return postfix;
   }
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
