@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_calculator/bloc/caculator_event.dart';
 import 'package:bloc_calculator/bloc/calculator_state.dart';
@@ -10,15 +8,20 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<String> operator = ['+', '-', '*', '/'];
 
   CalculatorBloc() : super(const CalculatorState.init()) {
-    // 로직 다시 짜야됨
-
     on<NumberPressed>(
       (NumberPressed event, emit) {
         if (!isCalculated) {
+          if (state.input == '0') {
+            emit(state.copyWith(input: ''));
+          }
           emit(state.copyWith(input: state.input + event.number.toString()));
         }
-
         if (isCalculated) {
+          if (event.number == 0) {
+            emit(state.copyWith(
+                input: '', result: state.calculateResultNumber.toString()));
+            isCalculated = false;
+          }
           emit(state.copyWith(input: event.number.toString()));
         }
         isNumber = true;
@@ -39,12 +42,13 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         List<dynamic> postfix = [];
         num resultNumber = 0;
 
-        // 중위 표기식 토큰
+        // 중위 표기식
         getInitFixExpression(numbers, operatorList);
         // 후위 표기식 변환
         postfix = getPostFixExpression(numbers, operatorList);
         // 후위 표기식 계산
         resultNumber = getPostFixCalculateResult(postfix);
+        print(resultNumber);
 
         emit(state.copyWith(
             input: resultNumber.toString(),
@@ -60,11 +64,14 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
               input: '0', result: state.calculateResultNumber.toString()));
           isCalculated = false;
           isNumber = true;
-        } else {
-          if (state.input != '') {
-            emit(state.copyWith(
-                input: state.input.substring(0, state.input.length - 1)));
-          }
+        }
+        if (state.input != '') {
+          emit(state.copyWith(
+              input: state.input.substring(0, state.input.length - 1)));
+        }
+
+        if (state.input == '') {
+          emit(state.copyWith(input: '0'));
         }
       },
     );
