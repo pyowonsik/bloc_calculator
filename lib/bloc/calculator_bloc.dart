@@ -140,8 +140,9 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
         }
       }
     }
-
-    return [...postfix, ...sstack];
+    postfix.addAll(List.from(sstack.reversed));
+    sstack.clear();
+    return postfix;
   }
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
