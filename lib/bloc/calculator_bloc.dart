@@ -6,20 +6,17 @@ const String initializedNumber = '0';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<String> operator = ['+', '-', '*', '/'];
+  int get expressionLastIndex => state.inputExpression.length - 1;
 
   CalculatorBloc() : super(const CalculatorState.init()) {
     on<NumberPressed>(
       (NumberPressed event, emit) {
-        if (!state.isCalculated) {
-          if (state.inputExpression == initializedNumber) {
-            emit(state.copyWith(inputExpression: ''));
-          }
-          emit(state.copyWith(
-              inputExpression:
-                  state.inputExpression + event.number.toString()));
+        if (!state.isCalculated && state.inputExpression == initializedNumber) {
+          return emit(state.copyWith(inputExpression: '${event.number}'));
         }
+
         if (state.isCalculated) {
-          emit(
+          return emit(
             state.copyWith(
               inputExpression: event.number.toString(),
               resultExpression: 'Ans = ${state.calculatedNumber.toString()}',
@@ -27,35 +24,50 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
             ),
           );
         }
+        return emit(state.copyWith(
+            inputExpression: state.inputExpression + event.number.toString()));
+
+        // if (!state.isCalculated && state.inputExpression == initializedNumber) {
+        //   emit(state.copyWith(inputExpression: ''));
+        // }
+        // emit(state.copyWith(
+        //     inputExpression: state.inputExpression + event.number.toString()));
+
+        // if (state.isCalculated) {
+        //   emit(
+        //     state.copyWith(
+        //       inputExpression: event.number.toString(),
+        //       resultExpression: 'Ans = ${state.calculatedNumber.toString()}',
+        //       isCalculated: false,
+        //     ),
+        //   );
+        // }
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
-      if (operator
-          .contains(state.inputExpression[state.inputExpression.length - 1])) {
-        emit(
+      if (operator.contains(state.inputExpression[expressionLastIndex])) {
+        return emit(
           state.copyWith(
             isCalculated: false,
             inputExpression: state.inputExpression.toString().replaceRange(
-                  state.inputExpression.length - 1,
+                  expressionLastIndex,
                   null,
                   event.operator.toString(),
                 ),
           ),
         );
-      } else {
-        emit(
-          state.copyWith(
-            inputExpression: state.inputExpression + event.operator,
-            isCalculated: false,
-          ),
-        );
       }
+      return emit(
+        state.copyWith(
+          inputExpression: state.inputExpression + event.operator,
+          isCalculated: false,
+        ),
+      );
     });
 
     on<CalculatePressed>(
       (CalculatePressed event, emit) {
         num resultNumber = 0;
-
         resultNumber = getPostFixCalculateResult(getPostFixExpression(
             getNumbersFromExpression(state.inputExpression),
             getOperatorFromExpression(state.inputExpression)));
@@ -80,14 +92,16 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                 resultExpression: 'Ans = ${state.calculatedNumber.toString()}'),
           );
         }
+
         if (state.inputExpression != '') {
           emit(
             state.copyWith(
-              inputExpression: state.inputExpression
-                  .substring(0, state.inputExpression.length - 1),
+              inputExpression:
+                  state.inputExpression.substring(0, expressionLastIndex),
             ),
           );
         }
+
         if (state.inputExpression == '') {
           emit(state.copyWith(inputExpression: '0'));
         }
@@ -95,58 +109,62 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     );
   }
 
-  List<num> getNumbersFromExpression(String inputExpression) {
-    return RegExp(r'\d+')
-        .allMatches(inputExpression)
-        .map((e) => double.parse(e[0]!))
-        .toList();
-  }
+  List<num> getNumbersFromExpression(String inputExpression) => RegExp(r'\d+')
+      .allMatches(inputExpression)
+      .map((e) => double.parse(e[0]!))
+      .toList();
 
-  List<String> getOperatorFromExpression(String inputExpression) {
-    return inputExpression.split(RegExp(r'\d+')).where((e) => e != '').toList();
-  }
+  List<String> getOperatorFromExpression(String inputExpression) =>
+      inputExpression.split(RegExp(r'\d+')).where((e) => e != '').toList();
 
   List<dynamic> getPostFixExpression(
       List<num> numbers, List<String> operatorList) {
     List<dynamic> postfix = [];
     List<String> sstack = [];
     operatorList.add('');
+
     for (var i = 0; i < numbers.length; i++) {
       postfix.add(numbers[i]);
+
       if (sstack.isEmpty) {
         sstack.add(operatorList[i]);
       } else {
+        // if (operatorList[i] == '*' || operatorList[i] == '/') {
+        //   if (sstack.contains(operatorList[i])) {
+        //     postfix.add(sstack.removeLast());
+        //   }
+        //   sstack.add(operatorList[i]);
+        // }
+
         if (operatorList[i] == '*' || operatorList[i] == '/') {
+          // 우선순위 같음
           if (sstack.contains('*') || sstack.contains('/')) {
-            sstack.removeLast();
+            postfix.add(sstack.removeLast());
             sstack.add(operatorList[i]);
+            print('sstack : $sstack');
           }
+
+          // 우선순위 낮음
           if (sstack.contains('+') || sstack.contains('-')) {
             sstack.add(operatorList[i]);
-          } else {
-            postfix.addAll(List.from(sstack.reversed));
-            sstack.clear();
-            sstack.add(operatorList[i]);
+            print('sstack : $sstack');
           }
         }
 
-        if (operatorList[i] == '+' || operatorList[i] == '-') {
-          if (sstack.any((e) => operator.contains(e))) {
-            postfix.addAll(List.from(sstack.reversed));
-            sstack.clear();
-            sstack.add(operatorList[i]);
-          }
+        if ((operatorList[i] == '+' || operatorList[i] == '-') &&
+            sstack.any((e) => operator.contains(e))) {
+          postfix.addAll([...sstack.reversed]);
+          sstack.clear();
+          sstack.add(operatorList[i]);
         }
       }
     }
 
-    return [...postfix, ...sstack];
-    // postfix.addAll(List.from(sstack.reversed));
-    // sstack.clear();
-    // return postfix;
+    return [...postfix, ...sstack.reversed];
   }
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
+    print(postfix);
     List<dynamic> resultStack = [];
     num firstNumber = 0;
     num lastNumber = 0;
