@@ -6,6 +6,7 @@ const String initializedNumber = '0';
 
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<String> operator = ['+', '-', '*', '/'];
+  int get expressionLength => state.inputExpression.length - 1;
 
   CalculatorBloc() : super(const CalculatorState.init()) {
     on<NumberPressed>(
@@ -18,6 +19,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
               inputExpression:
                   state.inputExpression + event.number.toString()));
         }
+
         if (state.isCalculated) {
           emit(
             state.copyWith(
@@ -30,32 +32,29 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
-      if (operator
-          .contains(state.inputExpression[state.inputExpression.length - 1])) {
-        emit(
+      if (operator.contains(state.inputExpression[expressionLength])) {
+        return emit(
           state.copyWith(
             isCalculated: false,
             inputExpression: state.inputExpression.toString().replaceRange(
-                  state.inputExpression.length - 1,
+                  expressionLength,
                   null,
                   event.operator.toString(),
                 ),
           ),
         );
-      } else {
-        emit(
-          state.copyWith(
-            inputExpression: state.inputExpression + event.operator,
-            isCalculated: false,
-          ),
-        );
       }
+      return emit(
+        state.copyWith(
+          inputExpression: state.inputExpression + event.operator,
+          isCalculated: false,
+        ),
+      );
     });
 
     on<CalculatePressed>(
       (CalculatePressed event, emit) {
         num resultNumber = 0;
-
         resultNumber = getPostFixCalculateResult(getPostFixExpression(
             getNumbersFromExpression(state.inputExpression),
             getOperatorFromExpression(state.inputExpression)));
@@ -80,14 +79,16 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
                 resultExpression: 'Ans = ${state.calculatedNumber.toString()}'),
           );
         }
+
         if (state.inputExpression != '') {
           emit(
             state.copyWith(
-              inputExpression: state.inputExpression
-                  .substring(0, state.inputExpression.length - 1),
+              inputExpression:
+                  state.inputExpression.substring(0, expressionLength),
             ),
           );
         }
+
         if (state.inputExpression == '') {
           emit(state.copyWith(inputExpression: '0'));
         }
@@ -141,9 +142,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     }
 
     return [...postfix, ...sstack];
-    // postfix.addAll(List.from(sstack.reversed));
-    // sstack.clear();
-    // return postfix;
   }
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
