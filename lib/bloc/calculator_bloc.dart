@@ -12,17 +12,24 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     on<NumberPressed>(
       (NumberPressed event, emit) {
         if (state.isCalculated) {
+          if (event.number == initializedNumber) {
+            return emit(state.copyWith(
+                inputExpression: event.number,
+                resultExpression:
+                    'Ans = ${state.calculatedNumber.toString()}'));
+          }
+
           return emit(
             state.copyWith(
               inputExpression: event.number.toString(),
-              resultExpression: 'Ans = ${state.calculatedNumber.toString()}',
               isCalculated: false,
             ),
           );
         }
 
         if (state.inputExpression == initializedNumber) {
-          return emit(state.copyWith(inputExpression: '${event.number}'));
+          return emit(state.copyWith(
+              inputExpression: event.number, resultExpression: '0'));
         }
 
         return emit(state.copyWith(

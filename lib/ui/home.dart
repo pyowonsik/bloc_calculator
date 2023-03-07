@@ -4,14 +4,12 @@ import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-// develop 브랜치에서 다 가져와서 pr
-
 class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    bool isCalculate = false;
+    // ['7','8','9','4','5','6','1','2','3'].map((e) => ElevatedButton(onPressed : NumberPressed(number: e.toString()), child: child))
 
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
@@ -19,11 +17,9 @@ class Home extends StatelessWidget {
         children: [
           BlocBuilder<CalculatorBloc, CalculatorState>(
               builder: (context, state) {
-            return (isCalculate)
-                ? Text(state.resultExpression.toString(),
-                    style: const TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.bold))
-                : Container();
+            return Text(state.resultExpression.toString(),
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold));
           }),
           const SizedBox(height: 20),
           BlocBuilder<CalculatorBloc, CalculatorState>(
@@ -118,7 +114,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '7'));
+                        .add(NumberPressed(number: '1'));
                   },
                   child: const Text('1')),
               const SizedBox(width: 10),
@@ -126,7 +122,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '8'));
+                        .add(NumberPressed(number: '2'));
                   },
                   child: const Text('2')),
               const SizedBox(width: 10),
@@ -134,7 +130,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '9'));
+                        .add(NumberPressed(number: '3'));
                   },
                   child: const Text('3')),
               const SizedBox(width: 10),
@@ -166,7 +162,6 @@ class Home extends StatelessWidget {
                 return ElevatedButton(
                     onPressed: () {
                       context.read<CalculatorBloc>().add(CalculatePressed());
-                      isCalculate = true;
                     },
                     child: const Text('='));
               }),

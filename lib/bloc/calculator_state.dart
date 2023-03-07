@@ -15,7 +15,7 @@ class CalculatorState extends Equatable {
   const CalculatorState.init()
       : this(
           inputExpression: '0',
-          resultExpression: '0',
+          resultExpression: '',
           calculatedNumber: 0,
           isCalculated: false,
         );
