@@ -25,12 +25,7 @@ List<String> keypads = [
   '+',
 ];
 
-bool isNumber(String keypad) {
-  if (numbers.contains(keypad)) {
-    return true;
-  }
-  return false;
-}
+bool isNumber(String keypad) => numbers.contains(keypad) ? true : false;
 
 bool isOperator(String keypad) {
   if (operators.contains(keypad)) {
@@ -53,61 +48,57 @@ bool isRemove(String keypad) {
   return false;
 }
 
-class Home extends StatelessWidget {
-  const Home({super.key});
-
-  CalculatorEvent getEvent(String keypad) {
-    if (isNumber(keypad)) {
-      return NumberPressed(number: keypad);
-    }
-    if (isOperator(keypad)) {
-      return OperatorPressed(operator: keypad);
-    }
-    if (isCalculate(keypad)) {
-      return CalculatePressed();
-    }
-    if (isRemove(keypad)) {
-      return RemovePressed();
-    }
-
+CalculatorEvent getEvent(String keypad) {
+  if (isNumber(keypad)) {
     return NumberPressed(number: keypad);
   }
+  if (isOperator(keypad)) {
+    return OperatorPressed(operator: keypad);
+  }
+  if (isCalculate(keypad)) {
+    return CalculatePressed();
+  }
+  if (isRemove(keypad)) {
+    return RemovePressed();
+  }
+  return NumberPressed(number: keypad);
+}
+
+class Home extends StatelessWidget {
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
-      body: Column(
-        children: [
-          BlocBuilder<CalculatorBloc, CalculatorState>(
-              builder: (context, state) {
-            return Column(
-              children: [
-                Text(state.resultExpression.toString(),
-                    style: const TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                Text(state.inputExpression.toString(),
-                    style: const TextStyle(
-                        fontSize: 40, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-              ],
-            );
-          }),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 4,
-              children: keypads
-                  .map((keypad) => ElevatedButton(
-                        onPressed: () => context
-                            .read<CalculatorBloc>()
-                            .add(getEvent(keypad)),
-                        child: Text(keypad),
-                      ))
-                  .toList(),
-            ),
-          ),
-        ],
+      body: BlocBuilder<CalculatorBloc, CalculatorState>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              Text(state.resultExpression.toString(),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              Text(state.inputExpression.toString(),
+                  style: const TextStyle(
+                      fontSize: 40, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 4,
+                  children: keypads
+                      .map((keypad) => ElevatedButton(
+                            onPressed: () => context
+                                .read<CalculatorBloc>()
+                                .add(getEvent(keypad)),
+                            child: Text(keypad),
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
