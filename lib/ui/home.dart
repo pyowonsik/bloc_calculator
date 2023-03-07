@@ -4,13 +4,77 @@ import 'package:bloc_calculator/bloc/calculator_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+List<String> numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+List<String> operators = ['+', '-', '*', '/'];
+List<String> keypads = [
+  '7',
+  '8',
+  '9',
+  '/',
+  '4',
+  '5',
+  '6',
+  '*',
+  '1',
+  '2',
+  '3',
+  '-',
+  '0',
+  '=',
+  'CE',
+  '+',
+];
+
+bool isNumber(String keypad) {
+  if (numbers.contains(keypad)) {
+    return true;
+  }
+  return false;
+}
+
+bool isOperator(String keypad) {
+  if (operators.contains(keypad)) {
+    return true;
+  }
+  return false;
+}
+
+bool isCalculate(String keypad) {
+  if (keypad == '=') {
+    return true;
+  }
+  return false;
+}
+
+bool isRemove(String keypad) {
+  if (keypad == 'CE') {
+    return true;
+  }
+  return false;
+}
+
 class Home extends StatelessWidget {
   const Home({super.key});
 
+  CalculatorEvent getEvent(String keypad) {
+    if (isNumber(keypad)) {
+      return NumberPressed(number: keypad);
+    }
+    if (isOperator(keypad)) {
+      return OperatorPressed(operator: keypad);
+    }
+    if (isCalculate(keypad)) {
+      return CalculatePressed();
+    }
+    if (isRemove(keypad)) {
+      return RemovePressed();
+    }
+
+    return NumberPressed(number: keypad);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ['7','8','9','4','5','6','1','2','3'].map((e) => ElevatedButton(onPressed : NumberPressed(number: e.toString()), child: child))
-
     return Scaffold(
       appBar: AppBar(title: const Text('Calculator')),
       body: Column(
@@ -30,159 +94,18 @@ class Home extends StatelessWidget {
               ],
             );
           }),
-
-          // Expanded(child: GridView.count(crossAxisCount: 4,)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '7'));
-                  },
-                  child: const Text('7')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '8'));
-                  },
-                  child: const Text('8')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '9'));
-                  },
-                  child: const Text('9')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(OperatorPressed(operator: '/'));
-                  },
-                  child: const Text('/')),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '4'));
-                  },
-                  child: const Text('4')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '5'));
-                  },
-                  child: const Text('5')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '6'));
-                  },
-                  child: const Text('6')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(OperatorPressed(operator: '*'));
-                  },
-                  child: const Text('*')),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '1'));
-                  },
-                  child: const Text('1')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '2'));
-                  },
-                  child: const Text('2')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '3'));
-                  },
-                  child: const Text('3')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(OperatorPressed(operator: '-'));
-                  },
-                  child: const Text('-')),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(NumberPressed(number: '0'));
-                  },
-                  child: const Text('0')),
-              const SizedBox(width: 10),
-              BlocBuilder<CalculatorBloc, CalculatorState>(
-                  builder: (context, state) {
-                return ElevatedButton(
-                    onPressed: () {
-                      context.read<CalculatorBloc>().add(CalculatePressed());
-                    },
-                    child: const Text('='));
-              }),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<CalculatorBloc>().add(RemovePressed());
-                  },
-                  child: const Text('CE')),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<CalculatorBloc>()
-                        .add(OperatorPressed(operator: '+'));
-                  },
-                  child: const Text('+')),
-            ],
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 4,
+              children: keypads
+                  .map((keypad) => ElevatedButton(
+                        onPressed: () => context
+                            .read<CalculatorBloc>()
+                            .add(getEvent(keypad)),
+                        child: Text(keypad),
+                      ))
+                  .toList(),
+            ),
           ),
         ],
       ),
