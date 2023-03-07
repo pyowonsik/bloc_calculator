@@ -29,7 +29,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
         if (state.inputExpression == initializedNumber) {
           return emit(state.copyWith(
-              inputExpression: event.number, resultExpression: '0'));
+              inputExpression: event.number,
+              resultExpression: 'Ans = $initializedNumber'));
         }
 
         return emit(state.copyWith(
