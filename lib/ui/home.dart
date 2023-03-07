@@ -27,26 +27,11 @@ List<String> keypads = [
 
 bool isNumber(String keypad) => numbers.contains(keypad) ? true : false;
 
-bool isOperator(String keypad) {
-  if (operators.contains(keypad)) {
-    return true;
-  }
-  return false;
-}
+bool isOperator(String keypad) => operators.contains(keypad) ? true : false;
 
-bool isCalculate(String keypad) {
-  if (keypad == '=') {
-    return true;
-  }
-  return false;
-}
+bool isCalculate(String keypad) => keypad == '=';
 
-bool isRemove(String keypad) {
-  if (keypad == 'CE') {
-    return true;
-  }
-  return false;
-}
+bool isRemove(String keypad) => keypad == 'CE';
 
 CalculatorEvent getEvent(String keypad) {
   if (isNumber(keypad)) {
