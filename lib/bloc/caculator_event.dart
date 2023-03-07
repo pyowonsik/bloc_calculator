@@ -6,14 +6,14 @@ abstract class CalculatorEvent extends Equatable {
 }
 
 class InputEvent extends CalculatorEvent {
-  final dynamic input;
+  final String input;
   InputEvent({required this.input});
   @override
   List<Object> get props => [input];
 }
 
 class NumberPressed extends CalculatorEvent {
-  final int number;
+  final String number;
   NumberPressed({required this.number});
   @override
   List<Object> get props => [number];
