@@ -11,10 +11,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   CalculatorBloc() : super(const CalculatorState.init()) {
     on<NumberPressed>(
       (NumberPressed event, emit) {
-        if (!state.isCalculated && state.inputExpression == initializedNumber) {
-          return emit(state.copyWith(inputExpression: '${event.number}'));
-        }
-
         if (state.isCalculated) {
           return emit(
             state.copyWith(
@@ -24,24 +20,13 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
             ),
           );
         }
+
+        if (state.inputExpression == initializedNumber) {
+          return emit(state.copyWith(inputExpression: '${event.number}'));
+        }
+
         return emit(state.copyWith(
             inputExpression: state.inputExpression + event.number.toString()));
-
-        // if (!state.isCalculated && state.inputExpression == initializedNumber) {
-        //   emit(state.copyWith(inputExpression: ''));
-        // }
-        // emit(state.copyWith(
-        //     inputExpression: state.inputExpression + event.number.toString()));
-
-        // if (state.isCalculated) {
-        //   emit(
-        //     state.copyWith(
-        //       inputExpression: event.number.toString(),
-        //       resultExpression: 'Ans = ${state.calculatedNumber.toString()}',
-        //       isCalculated: false,
-        //     ),
-        //   );
-        // }
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
@@ -67,10 +52,12 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
     on<CalculatePressed>(
       (CalculatePressed event, emit) {
-        num resultNumber = 0;
-        resultNumber = getPostFixCalculateResult(getPostFixExpression(
+        num resultNumber = getPostFixCalculateResult(
+          getPostFixExpression(
             getNumbersFromExpression(state.inputExpression),
-            getOperatorFromExpression(state.inputExpression)));
+            getOperatorFromExpression(state.inputExpression),
+          ),
+        );
         emit(
           state.copyWith(
             inputExpression: resultNumber.toString(),
@@ -85,26 +72,18 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     on<RemovePressed>(
       (RemovePressed event, emit) {
         if (state.isCalculated) {
-          emit(
-            state.copyWith(
-                isCalculated: false,
-                inputExpression: '0',
-                resultExpression: 'Ans = ${state.calculatedNumber.toString()}'),
-          );
+          return emit(state.copyWith(
+              isCalculated: false,
+              inputExpression: '0',
+              resultExpression: 'Ans = ${state.calculatedNumber.toString()}'));
         }
-
-        if (state.inputExpression != '') {
-          emit(
-            state.copyWith(
-              inputExpression:
-                  state.inputExpression.substring(0, expressionLastIndex),
-            ),
-          );
+        if (state.inputExpression.length == 1) {
+          return emit(state.copyWith(inputExpression: initializedNumber));
         }
-
-        if (state.inputExpression == '') {
-          emit(state.copyWith(inputExpression: '0'));
-        }
+        return emit(state.copyWith(
+          inputExpression:
+              state.inputExpression.substring(0, expressionLastIndex),
+        ));
       },
     );
   }
@@ -129,30 +108,13 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       if (sstack.isEmpty) {
         sstack.add(operatorList[i]);
       } else {
-        // if (operatorList[i] == '*' || operatorList[i] == '/') {
-        //   if (sstack.contains(operatorList[i])) {
-        //     postfix.add(sstack.removeLast());
-        //   }
-        //   sstack.add(operatorList[i]);
-        // }
-
         if (operatorList[i] == '*' || operatorList[i] == '/') {
-          // 우선순위 같음
-          if (sstack.contains('*') || sstack.contains('/')) {
+          while (sstack.last == '*' || sstack.last == '/') {
             postfix.add(sstack.removeLast());
-            sstack.add(operatorList[i]);
-            print('sstack : $sstack');
           }
-
-          // 우선순위 낮음
-          if (sstack.contains('+') || sstack.contains('-')) {
-            sstack.add(operatorList[i]);
-            print('sstack : $sstack');
-          }
+          sstack.add(operatorList[i]);
         }
-
-        if ((operatorList[i] == '+' || operatorList[i] == '-') &&
-            sstack.any((e) => operator.contains(e))) {
+        if ((operatorList[i] == '+' || operatorList[i] == '-')) {
           postfix.addAll([...sstack.reversed]);
           sstack.clear();
           sstack.add(operatorList[i]);
@@ -164,7 +126,6 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   num getPostFixCalculateResult(List<dynamic> postfix) {
-    print(postfix);
     List<dynamic> resultStack = [];
     for (var i = 0; i < postfix.length; i++) {
       if (!operator.contains(postfix[i])) {

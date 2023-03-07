@@ -40,7 +40,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 7));
+                        .add(NumberPressed(number: '7'));
                   },
                   child: const Text('7')),
               const SizedBox(width: 10),
@@ -48,7 +48,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 8));
+                        .add(NumberPressed(number: '8'));
                   },
                   child: const Text('8')),
               const SizedBox(width: 10),
@@ -56,7 +56,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 9));
+                        .add(NumberPressed(number: '9'));
                   },
                   child: const Text('9')),
               const SizedBox(width: 10),
@@ -79,7 +79,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 4));
+                        .add(NumberPressed(number: '4'));
                   },
                   child: const Text('4')),
               const SizedBox(width: 10),
@@ -87,7 +87,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 5));
+                        .add(NumberPressed(number: '5'));
                   },
                   child: const Text('5')),
               const SizedBox(width: 10),
@@ -95,7 +95,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 6));
+                        .add(NumberPressed(number: '6'));
                   },
                   child: const Text('6')),
               const SizedBox(width: 10),
@@ -118,7 +118,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 1));
+                        .add(NumberPressed(number: '7'));
                   },
                   child: const Text('1')),
               const SizedBox(width: 10),
@@ -126,7 +126,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 2));
+                        .add(NumberPressed(number: '8'));
                   },
                   child: const Text('2')),
               const SizedBox(width: 10),
@@ -134,7 +134,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 3));
+                        .add(NumberPressed(number: '9'));
                   },
                   child: const Text('3')),
               const SizedBox(width: 10),
@@ -157,7 +157,7 @@ class Home extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<CalculatorBloc>()
-                        .add(NumberPressed(number: 0));
+                        .add(NumberPressed(number: '0'));
                   },
                   child: const Text('0')),
               const SizedBox(width: 10),
