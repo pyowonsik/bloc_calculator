@@ -17,18 +17,21 @@ class Home extends StatelessWidget {
         children: [
           BlocBuilder<CalculatorBloc, CalculatorState>(
               builder: (context, state) {
-            return Text(state.resultExpression.toString(),
-                style:
-                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold));
+            return Column(
+              children: [
+                Text(state.resultExpression.toString(),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                Text(state.inputExpression.toString(),
+                    style: const TextStyle(
+                        fontSize: 40, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+              ],
+            );
           }),
-          const SizedBox(height: 20),
-          BlocBuilder<CalculatorBloc, CalculatorState>(
-              builder: (context, state) {
-            return Text(state.inputExpression.toString(),
-                style:
-                    const TextStyle(fontSize: 40, fontWeight: FontWeight.bold));
-          }),
-          const SizedBox(height: 20),
+
+          // Expanded(child: GridView.count(crossAxisCount: 4,)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
