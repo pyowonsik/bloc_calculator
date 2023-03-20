@@ -1,39 +1,17 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class CalculatorState extends Equatable {
-  final String inputExpression;
-  final String resultExpression;
-  final num calculatedNumber;
-  final bool isCalculated;
-  const CalculatorState({
-    required this.inputExpression,
-    required this.resultExpression,
-    required this.calculatedNumber,
-    required this.isCalculated,
-  });
+part 'calculator_state.freezed.dart';
+part 'calculator_state.g.dart';
 
-  const CalculatorState.init()
-      : this(
-          inputExpression: '0',
-          resultExpression: '',
-          calculatedNumber: 0,
-          isCalculated: false,
-        );
+@freezed
+class CalculatorState with _$CalculatorState {
+  factory CalculatorState({
+    required String inputExpression,
+    required String resultExpression,
+    required num calculatedNumber,
+    required bool isCalculated,
+  }) = _CalculatorState;
 
-  CalculatorState copyWith({
-    String? inputExpression,
-    String? resultExpression,
-    num? calculatedNumber,
-    bool? isCalculated,
-  }) {
-    return CalculatorState(
-      inputExpression: inputExpression ?? this.inputExpression,
-      resultExpression: resultExpression ?? this.resultExpression,
-      calculatedNumber: calculatedNumber ?? this.calculatedNumber,
-      isCalculated: isCalculated ?? this.isCalculated,
-    );
-  }
-
-  @override
-  List<Object> get props => [inputExpression, resultExpression];
+  factory CalculatorState.fromJson(Map<String, dynamic> json) =>
+      _$CalculatorStateFromJson(json);
 }

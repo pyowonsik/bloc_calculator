@@ -39,6 +39,11 @@ dependencies:
   flutter_bloc: ^8.1.2
   binary_tree: ^1.0.5
   stack: ^0.2.1
+  build_runner: ^2.3.3
+  freezed: ^2.3.2
+  json_serializable: ^6.6.1
+  freezed_annotation: ^2.2.0
+  json_annotation: ^4.8.0
 
 dev_dependencies:
   flutter_test:
