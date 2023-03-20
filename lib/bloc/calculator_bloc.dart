@@ -22,6 +22,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
           return emit(
             state.copyWith(
               inputExpression: event.number.toString(),
+              resultExpression: state.calculatedNumber.toString(),
               isCalculated: false,
             ),
           );
@@ -38,24 +39,35 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       },
     );
     on<OperatorPressed>((OperatorPressed event, emit) {
-      if (operator.contains(state.inputExpression[expressionLastIndex])) {
+      if (!state.isCalculated) {
+        if (operator.contains(state.inputExpression[expressionLastIndex])) {
+          return emit(
+            state.copyWith(
+              isCalculated: false,
+              inputExpression: state.inputExpression.toString().replaceRange(
+                    expressionLastIndex,
+                    null,
+                    event.operator.toString(),
+                  ),
+            ),
+          );
+        }
+
         return emit(
           state.copyWith(
+            inputExpression: state.inputExpression + event.operator,
             isCalculated: false,
-            inputExpression: state.inputExpression.toString().replaceRange(
-                  expressionLastIndex,
-                  null,
-                  event.operator.toString(),
-                ),
           ),
         );
       }
-      return emit(
-        state.copyWith(
+
+      if (state.isCalculated) {
+        return emit(state.copyWith(
+          resultExpression: state.inputExpression,
           inputExpression: state.inputExpression + event.operator,
           isCalculated: false,
-        ),
-      );
+        ));
+      }
     });
 
     on<CalculatePressed>(
@@ -66,7 +78,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
             getOperatorFromExpression(state.inputExpression),
           ),
         );
-        emit(
+        return emit(
           state.copyWith(
             inputExpression: resultNumber.toString(),
             resultExpression: state.inputExpression,
