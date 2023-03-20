@@ -8,7 +8,12 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   List<String> operator = ['+', '-', '*', '/'];
   int get expressionLastIndex => state.inputExpression.length - 1;
 
-  CalculatorBloc() : super(const CalculatorState.init()) {
+  CalculatorBloc()
+      : super(CalculatorState(
+            inputExpression: '',
+            resultExpression: '',
+            isCalculated: false,
+            calculatedNumber: 0)) {
     on<NumberPressed>(
       (NumberPressed event, emit) {
         if (state.isCalculated) {

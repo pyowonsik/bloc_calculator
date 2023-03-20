@@ -1,37 +1,17 @@
-class CalculatorState {
-  final String inputExpression;
-  final String resultExpression;
-  final num calculatedNumber;
-  final bool isCalculated;
-  const CalculatorState({
-    required this.inputExpression,
-    required this.resultExpression,
-    required this.calculatedNumber,
-    required this.isCalculated,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const CalculatorState.init()
-      : this(
-          inputExpression: '0',
-          resultExpression: '',
-          calculatedNumber: 0,
-          isCalculated: false,
-        );
+part 'calculator_state.freezed.dart';
+part 'calculator_state.g.dart';
 
-  CalculatorState copyWith({
-    String? inputExpression,
-    String? resultExpression,
-    num? calculatedNumber,
-    bool? isCalculated,
-  }) {
-    return CalculatorState(
-      inputExpression: inputExpression ?? this.inputExpression,
-      resultExpression: resultExpression ?? this.resultExpression,
-      calculatedNumber: calculatedNumber ?? this.calculatedNumber,
-      isCalculated: isCalculated ?? this.isCalculated,
-    );
-  }
+@freezed
+class CalculatorState with _$CalculatorState {
+  factory CalculatorState({
+    required String inputExpression,
+    required String resultExpression,
+    required num calculatedNumber,
+    required bool isCalculated,
+  }) = _CalculatorState;
 
-  @override
-  List<Object> get props => [inputExpression, resultExpression];
+  factory CalculatorState.fromJson(Map<String, dynamic> json) =>
+      _$CalculatorStateFromJson(json);
 }
