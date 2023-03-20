@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-class CalculatorState extends Equatable {
+class CalculatorState {
   final String inputExpression;
   final String resultExpression;
   final num calculatedNumber;
